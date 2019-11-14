@@ -1,6 +1,9 @@
 import RNA
-import pandas as pd
+import pickle
 import os
+import sys
 
+# Currently testing only Vienna 2
 if __name__ == '__main__':
-    puzzle_file = pd.read_csv(os.getcwd() + '/eterna100.txt', sep=' ', delimiter='\t', header='infer')
+    
+    
