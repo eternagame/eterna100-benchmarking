@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
                 i += 1
 
-	for res, name in zip(solved, names):
-		print('%s: %i' % (name, res))
+	for res in solved:
+		print('%i' % res)
 	print('\nSolved %i/100' % sum(solved))
 	
