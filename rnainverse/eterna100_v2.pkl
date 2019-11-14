@@ -686,9 +686,9 @@ p380
 aa(lp381
 S'Hard Y and a bit more'
 p382
-aS'.....(((((((.(((((....)))).)))(((((.((..((((....))))..(((((......)))))..)).))))))))))...................._'
+aS'.....(((((((.(((((....)))).)))(((((.((..((((....))))..(((((......)))))..)).))))))))))....................'
 p383
-aS'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+aS'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 p384
 aS'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
 p385
