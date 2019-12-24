@@ -1,0 +1,5 @@
+Use files from here https://github.com/RK900/learna/
+Only works on Ubuntu
+
+Example run:
+python utils/timed_execution.py --timeout 60 --data_dir data/ --results_dir results/ --experiment_group reproduce_iclr_2019 --method LEARNA --dataset eterna --task_id 7
