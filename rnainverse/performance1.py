@@ -7,15 +7,18 @@ from tqdm import tqdm
 
 # Currently testing only Vienna 2
 if __name__ == '__main__':
-	puzzle_file = pd.read_csv(os.getcwd() + '/eterna100_v1_tabs.txt', sep='\t', delimiter='\t', names=['Name', 'Structure', 'Start', 'Locks'])
+	df = pd.read_csv(os.getcwd() + '/eterna100_v1_tabs.txt', sep='\t', delimiter='\t', names=['Name', 'Structure', 'Start', 'Locks'])
+	struc = df['Structure'].tolist()
+	start = df['Start'].tolist()
+	puzzle_file = list(zip(start, struc))
 	
 	solved = []
 	names = []
 		
 	i = 1
 	for puzzle in tqdm(puzzle_file):
-		assert(len(puzzle[2]) == len(puzzle[1]), 'Starting sequence length and puzzle length do not match')
-		result = RNA.inverse_fold(puzzle[2], puzzle[1])[1]
+		# assert(len(puzzle[2]) == len(puzzle[1]), 'Starting sequence length and puzzle length do not match')
+		result = RNA.inverse_fold(puzzle[0], puzzle[1])[1]
 		names.append(puzzle[0])
 		if result == 0.0:
 			solved.append(1)
