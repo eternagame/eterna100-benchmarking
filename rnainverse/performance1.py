@@ -30,5 +30,8 @@ if __name__ == '__main__':
 
 	for res in solved:
 		print('%i' % res)
+	with open(os.getcwd() + '/results_rnai_vienna_1.txt', 'w') as f:
+		for res in solved:
+			f.write("%i\n" % res)
 	print('\nSolved %i/100' % sum(solved))
 	
