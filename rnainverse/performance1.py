@@ -1,11 +1,27 @@
-import RNA
 import pickle
 import os
 import sys
 import pandas as pd
 from tqdm import tqdm
+from subprocess import PIPE, Popen, STDOUT
+import re
 
-# Currently testing only Vienna 2
+RNAINVERSE_PATH = '../../ViennaRNA-1.8.5/Progs/./RNAinverse' 
+RNAFOLD_PATH = '../../ViennaRNA-1.8.5/Progs/./RNAfold'  
+
+def inverse_fold(struc, start):
+	p = Popen([RNAINVERSE_PATH, '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
+	pair = p.communicate(input='%s\n%s' % (struc, start))[0]
+	formatted = re.split('\s+| \(?\s?',pair)
+	return formatted[0]
+
+def fold(struc):
+	p = Popen([RNAFOLD_PATH, '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
+	pair = p.communicate(input='%s' % struc)[0]
+	formatted = re.split('\s+| \(?\s?',pair)
+	return formatted[1]
+
+
 if __name__ == '__main__':
 	df = pd.read_csv(os.getcwd() + '/eterna100_v1_tabs.txt', sep='\t', delimiter='\t', names=['Name', 'Structure', 'Start', 'Locks'])
 	struc = df['Structure'].tolist()
