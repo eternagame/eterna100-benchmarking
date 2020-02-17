@@ -5,6 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 from subprocess import PIPE, Popen, STDOUT
 import re
+import pickle
 
 RNAINVERSE_PATH = '../../ViennaRNA-1.8.5/Progs/./RNAinverse' 
 RNAFOLD_PATH = '../../ViennaRNA-1.8.5/Progs/./RNAfold'  
@@ -37,6 +38,8 @@ if __name__ == '__main__':
 		seqs.append(result)
 
 	assert(len(seqs) == len(puzzle_file))
+
+	pickle.dump(seqs, open(os.getcwd() + '/seqs', 'wb'))
 
 	print('Starting fold checking')
 
