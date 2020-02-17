@@ -26,23 +26,27 @@ if __name__ == '__main__':
 	df = pd.read_csv(os.getcwd() + '/eterna100_v1_tabs.txt', sep='\t', delimiter='\t', names=['Name', 'Structure', 'Start', 'Locks'])
 	struc = df['Structure'].tolist()
 	start = df['Start'].tolist()
-	puzzle_file = list(zip(start, struc))
+	puzzle_file = list(zip(struc, start))
+
+	seqs = []
 	
-	solved = []
-	names = []
-		
-	i = 1
+	print('Starting Inverse Folding')
 	for puzzle in tqdm(puzzle_file):
-		# assert(len(puzzle[2]) == len(puzzle[1]), 'Starting sequence length and puzzle length do not match')
-		result = RNA.inverse_fold(puzzle[0], puzzle[1])[1]
-		names.append(puzzle[0])
-		if result == 0.0:
+		assert(len(puzzle[0]) == len(puzzle[1]), 'Starting sequence length and puzzle length do not match')
+		result = inverse_fold(puzzle[0], puzzle[1].upper())
+		seqs.append(result)
+
+	assert(len(seqs) == len(puzzle_file))
+
+	print('Starting fold checking')
+
+	solved = []
+	for i in tqdm(range(len(puzzle_file))):
+		folded_struc = fold(seqs[i])
+		if puzzle_file[i][0] == folded_struc:
 			solved.append(1)
 		else:
 			solved.append(0)
-			
-		# print('Completed %i/100: %s' % (i, puzzle[0]))
-		i += 1
 
 	for res in solved:
 		print('%i' % res)
