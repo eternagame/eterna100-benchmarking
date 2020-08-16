@@ -1,6 +1,6 @@
-import pickle
+import pickle, os
 
-if __name__ == '__main__':
+def print_results():
 	total_performance = [0] * 100
 	puzzle_names = []
 
@@ -24,4 +24,18 @@ if __name__ == '__main__':
 		print("%s: %i" % (i, j))
 	
 	print("\nSolved %i/100" % solved)
+
+def export_sequences():
+	to_write = open(os.getcwd() + '/sentrna_v1_sols.txt', 'w')
+
+	model_result = pickle.load(open('1/model_refined%i.pkl' % 20, 'rb'))
+
+	for puzzle in range(len(model_result)):
+		to_write.write("" + model_result[puzzle][0] + '\t' + model_result[puzzle][1] + '\t' + model_result[puzzle][2] + '\n')
+
+	to_write.close()
+	
+
+if __name__ == '__main__':
+	export_sequences()
 
