@@ -4,8 +4,12 @@ def print_results():
 	total_performance = [0] * 100
 	puzzle_names = []
 
-	for i in range(20):
-		model_result = pickle.load(open('model_refined%i.pkl' % i, 'rb'))
+	for i in range(30):
+		try:
+			model_result = pickle.load(open(os.getcwd() + '/1/model_refined%i.pkl' % i, 'rb'))
+		except IOError:
+			print(i)
+			continue
 
 		for puzzle in range(len(model_result)):
 			if model_result[puzzle][3] == 1.0:
@@ -37,5 +41,5 @@ def export_sequences():
 	
 
 if __name__ == '__main__':
-	export_sequences()
+	print_results()
 

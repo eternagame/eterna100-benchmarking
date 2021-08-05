@@ -8,7 +8,7 @@ p.add_argument('inputfile')
 p.add_argument('--png', action='store_true')
 args = p.parse_args()
 
-color = {'A': 'y', 'U':'b', 'G':'r', 'C':'g', 'T': 'b', 'N': 'e'}
+color = {'A': 'y', 'U':'b', 'G':'r', 'C':'g', 'T': 'b', 'N': 'e', 'X': 'k'}
 def seq2col(seq):
     col = []
     for c in seq:

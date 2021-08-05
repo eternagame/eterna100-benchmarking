@@ -32,7 +32,7 @@ def run_old():
 	
 	print('Starting Inverse Folding')
 	for puzzle in tqdm(puzzle_file):
-		assert(len(puzzle[0]) == len(puzzle[1]), 'Starting sequence length and puzzle length do not match')
+		assert len(puzzle[0]) == len(puzzle[1], 'Starting sequence length and puzzle length do not match')
 		result = inverse_fold(puzzle[0], puzzle[1].upper())
 		seqs.append(result)
 

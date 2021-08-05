@@ -273,7 +273,7 @@ class RNARenderer:
                 
                 for ii in range(0,len(self.xarray_)):
                     if not render_in_letter:
-                        text_size = self.NODE_R * 0.0
+                        text_size = self.NODE_R * 1.5
                         if colors[ii] == [0,0,0]:
                             color = "#FFFFFF"
                         else:
