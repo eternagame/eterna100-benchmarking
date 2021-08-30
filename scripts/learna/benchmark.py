@@ -2,7 +2,7 @@ import subprocess
 import os
 from tqdm import tqdm
 
-def run(start, end): # [start, end]
+def run(start, end):
     for i in tqdm(range(start, end + 1)):
         subprocess.check_output(['make', 'run-meta-learna-adapt-eterna100-%i' % i])
 
