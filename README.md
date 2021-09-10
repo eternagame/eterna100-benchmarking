@@ -1,6 +1,6 @@
 # Eterna100 Benchmarking
 
-[Paper on bioRxiv](https://www.biorxiv.org/content/10.1101/2021.08.26.457839v1)
+[![Paper](https://img.shields.io/badge/paper-bioRxiv-a82525)](https://www.biorxiv.org/content/10.1101/2021.08.26.457839v1)
 
 This repository contains RNA design algorithm solutions for the Eterna100-V1 and Eterna100-V2.
 
