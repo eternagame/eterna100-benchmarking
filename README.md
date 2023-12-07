@@ -11,6 +11,3 @@ Each subdirectory has that algorithm's solutions to Eterna100-V1 and Eterna100-V
 `eterna100-v2-19-pids.txt` contains puzzle IDs for the original and new 19 redesigned puzzles that weren't solvable in Vienna 1. `eterna100-v2-19-solutions.csv` contains player solutions for each of the IDs in `eterna100-v2-19-pids.txt`.
 
 `scripts/` contains information on how to reproduce these results for every algorithm.
-
-## TODO
-Scripts for running NEMO still need to be uploaded.
