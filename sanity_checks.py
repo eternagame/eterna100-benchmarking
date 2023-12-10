@@ -22,8 +22,7 @@ def fold(seq, version: VIENNA_VERSIONS = 'latest'):
 def check_v2_sequences(outfile: str = 'v2_sanity_check.txt', version: VIENNA_VERSIONS = 'latest'):
     e100 = pd.read_csv('eterna100_vienna2.txt', sep='\t', header='infer')
     # make the 'Sample Solution (1)' and 'Sample Solution (2)' columns lists
-    sols1 = e100['Sample Solution (1)'].tolist()
-    sols2 = e100['Sample Solution (2)'].tolist()
+    sols1 = e100['Sample Solution'].tolist()
     strucs = e100['Secondary Structure'].tolist()
     names = e100['Puzzle Name'].tolist()
 
@@ -32,12 +31,8 @@ def check_v2_sequences(outfile: str = 'v2_sanity_check.txt', version: VIENNA_VER
     for i in range(100):
         struc1 = fold(sols1[i], version)
         if struc1 != strucs[i]:
-            struc2 = fold(sols2[i], version)
-            if struc2 != strucs[i]:
-                f.write(f'{names[i]}\t{strucs[i]}\t{sols1[i]}\t{struc1}\t{sols2[i]}\t{struc2}\n')
-                buggy.append(names[i])
-            else:
-                f.write('fine\n')
+            f.write(f'{names[i]}\t{strucs[i]}\t{sols1[i]}\t{struc1}\t{sols2[i]}\t{struc2}\n')
+            buggy.append(names[i])
         else:
             f.write('fine\n')
     
