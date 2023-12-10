@@ -1,4 +1,3 @@
-import RNA
 import pandas as pd
 import os
 from typing import Literal
@@ -8,6 +7,7 @@ VIENNA_VERSIONS = Literal['latest', '2.1.9', '2.4.8']
 
 def fold(seq, version: VIENNA_VERSIONS = 'latest'):
     if version == 'latest':
+        import RNA
         return RNA.fold(seq)[0]
     else:
         if version == '2.1.9'
@@ -63,4 +63,4 @@ def check_identical_structures():
 
 
 if __name__ == '__main__':
-    check_identical_structures()
+    check_v2_sequences(version='2.1.9')
