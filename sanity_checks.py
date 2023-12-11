@@ -20,10 +20,12 @@ def fold(seq, version: VIENNA_VERSIONS = 'latest'):
         return formatted[1]
 
 
-def check_v2_sequences(outfile: str = 'v2_sanity_check.txt', version: VIENNA_VERSIONS = 'latest'):
+def check_v2_sequences(solutions_file, outfile: str = 'v2_sanity_check.txt', version: VIENNA_VERSIONS = 'latest'):
     e100 = pd.read_csv('eterna100_vienna2.txt', sep='\t', header='infer')
-    # make the 'Sample Solution (1)' and 'Sample Solution (2)' columns lists
-    sols1 = e100['Sample Solution'].tolist()
+    solutions = pd.read_csv(solutions_file, sep=',', header='infer')
+    e100 = pd.merge(e100, solutions, how='inner', left_on='Eterna ID', right_on='puzzle_id')
+
+    sols1 = e100['sequence'].tolist()
     strucs = e100['Secondary Structure'].tolist()
     names = e100['Puzzle Name'].tolist()
 
