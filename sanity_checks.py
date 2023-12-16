@@ -60,5 +60,13 @@ def check_identical_structures():
             print(f'{names[i]}')
 
 
+def check_nemo_solutions():
+    nemo_solutions = pd.read_csv('hannah_files/NEMO_solutions.txt', header='infer', sep='\t', index_col=0)
+    nemo_solutions = nemo_solutions[nemo_solutions['Vienna_version'] == 2]
+    nemo_solutions = nemo_solutions[nemo_solutions['Eterna100_version'] == 2]
+
+    # need to check that they match nemo_solutions.target_structure and the e100-v2 solutions
+
+
 if __name__ == '__main__':
     check_v2_sequences(version='2.4.8')
