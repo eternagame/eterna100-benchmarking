@@ -60,5 +60,31 @@ def check_identical_structures():
             print(f'{names[i]}')
 
 
+def check_nemo_solutions(outfile: str = 'nemo_sanity_check.txt'):
+    nemo_solutions = pd.read_csv('hannah_files/NEMO_solutions_by_puzzle.txt', header='infer', sep='\t')
+    nemo_solutions = nemo_solutions[nemo_solutions['Vienna_version'] == 2]
+
+    # need to check that they match nemo_solutions.target_structure and the e100-v2 solutions
+
+    sols = nemo_solutions['MFE_seq_vienna2'].tolist()
+    strucs = nemo_solutions['target_structure'].tolist()
+
+    f = open(outfile, 'w')
+    buggy = []
+    f.write('Puzzle Name\tTarget Structure\tVienna2 Solution\tVienna2.1.9 Structure\tVienna2.4.8 Structure\n')
+    for i in range(len(sols)):
+        struc219 = fold(sols[i], '2.1.9')
+        struc248 = fold(sols[i], '2.4.8')
+        
+        if struc219 != strucs[i] or struc248 != strucs[i]:
+            f.write(f'{nemo_solutions.iloc[i]["puzzle_name"]}\t{strucs[i]}\t{sols[i]}\t{struc219}\t{struc248}\n')
+            print(f'{nemo_solutions.iloc[i]["puzzle_name"]}\t{strucs[i]}\t{sols[i]}\t{struc219}\t{struc248}\n')
+            buggy.append(nemo_solutions.iloc[i]["puzzle_name"])
+    
+    f.close()
+    print(f'Number of buggy sequences: {len(buggy)}')
+    print(buggy)
+
+
 if __name__ == '__main__':
     check_v2_sequences(version='2.4.8')
