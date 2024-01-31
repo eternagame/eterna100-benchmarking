@@ -4,13 +4,15 @@ from typing import Literal
 from subprocess import Popen, PIPE, STDOUT
 import re
 
-VIENNA_VERSIONS = Literal['latest', '2.1.9', '2.4.8']
+VIENNA_VERSIONS = Literal['latest', '1.8.5', '2.1.9', '2.4.8']
 
 def fold(seq, version: VIENNA_VERSIONS = 'latest'):
     if version == 'latest':
         import RNA
         return RNA.fold(seq)[0]
     else:
+        if version == '1.8.5':
+            p = Popen(['.././ViennaRNA219/bin/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
         if version == '2.1.9':
             p = Popen(['.././ViennaRNA219/bin/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
         elif version == '2.4.8':
@@ -21,7 +23,7 @@ def fold(seq, version: VIENNA_VERSIONS = 'latest'):
 
 
 def check_v2_sequences(solutions_file, outfile: str = 'v2_sanity_check.txt', version: VIENNA_VERSIONS = 'latest'):
-    e100 = pd.read_csv('eterna100_vienna2.txt', sep='\t', header='infer')
+    e100 = pd.read_csv('eterna100v2_vienna2.tsv', sep='\t', header='infer')
     solutions = pd.read_csv(solutions_file, sep=',', header='infer')
     e100 = pd.merge(e100, solutions, how='inner', left_on='Eterna ID', right_on='puzzle_id')
 
@@ -46,7 +48,7 @@ def check_v2_sequences(solutions_file, outfile: str = 'v2_sanity_check.txt', ver
 
 
 def check_identical_structures():
-    e100 = pd.read_csv('eterna100_vienna2.txt', sep='\t', header='infer')
+    e100 = pd.read_csv('eterna100v2_vienna2.tsv', sep='\t', header='infer')
     rnai = pd.read_csv('rnainverse/rnai_puzzle_solutions_v2.txt', sep='\t', header=None, names=['Puzzle Name', 'Secondary Structure', 'Solution'])
 
     # make the 'Secondary Structure' column lists
