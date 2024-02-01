@@ -4,7 +4,7 @@ from typing import Literal
 from subprocess import Popen, PIPE, STDOUT
 import re
 
-VIENNA_VERSIONS = Literal['latest', '1.8.5', '2.1.9', '2.4.8']
+VIENNA_VERSIONS = Literal['latest', '1.8.5', '2.1.9', '2.4.8', '2.6.3']
 
 def fold(seq, version: VIENNA_VERSIONS = 'latest'):
     if version == 'latest':
@@ -12,8 +12,8 @@ def fold(seq, version: VIENNA_VERSIONS = 'latest'):
         return RNA.fold(seq)[0]
     else:
         if version == '1.8.5':
-            p = Popen(['.././ViennaRNA219/bin/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
-        if version == '2.1.9':
+            p = Popen(['.././ViennaRNA185/bin/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
+        elif version == '2.1.9':
             p = Popen(['.././ViennaRNA219/bin/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
         elif version == '2.4.8':
             p = Popen(['.././ViennaRNA248/bin/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
@@ -22,12 +22,10 @@ def fold(seq, version: VIENNA_VERSIONS = 'latest'):
         return formatted[1]
 
 
-def check_v2_sequences(solutions_file, outfile: str = 'v2_sanity_check.txt', version: VIENNA_VERSIONS = 'latest'):
-    e100 = pd.read_csv('eterna100v2_vienna2.tsv', sep='\t', header='infer')
-    solutions = pd.read_csv(solutions_file, sep=',', header='infer')
-    e100 = pd.merge(e100, solutions, how='inner', left_on='Eterna ID', right_on='puzzle_id')
+def check_sample_sequences(infile: str, outfile: str, version: VIENNA_VERSIONS):
+    e100 = pd.read_csv(infile, sep='\t', header='infer')
 
-    sols1 = e100['sequence'].tolist()
+    sols1 = e100['Sample Solution'].tolist()
     strucs = e100['Secondary Structure'].tolist()
     names = e100['Puzzle Name'].tolist()
 
@@ -89,4 +87,10 @@ def check_nemo_solutions(outfile: str = 'nemo_sanity_check.txt'):
 
 
 if __name__ == '__main__':
-    check_v2_sequences(version='2.4.8')
+    if not os.path.exists('checks'):
+        os.mkdir('checks')
+    check_sample_sequences('eterna100v1_vienna1.tsv', 'checks/v1_vienna1_sanity_check.txt', '1.8.5')
+    check_sample_sequences('eterna100v2_vienna1.tsv', 'checks/v2_vienna1_sanity_check.txt', '1.8.5')
+    check_sample_sequences('eterna100v2_vienna2.tsv', 'checks/v2_vienna2_sanity_check.txt', 'latest')
+    check_sample_sequences('eterna100v2_vienna2.tsv', 'checks/v2_vienna248_sanity_check.txt', '2.4.8')
+    check_sample_sequences('eterna100v2_vienna2.tsv', 'checks/v2_vienna219_sanity_check.txt', '2.1.9')
