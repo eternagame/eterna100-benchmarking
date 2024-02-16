@@ -22,75 +22,47 @@ def fold(seq, version: VIENNA_VERSIONS = 'latest'):
         return formatted[1]
 
 
-def check_sample_sequences(infile: str, outfile: str, version: VIENNA_VERSIONS):
-    e100 = pd.read_csv(infile, sep='\t', header='infer')
+def check_sample_sequences(infile: str, version: VIENNA_VERSIONS):
+    print(f'Checking sample solution file {infile} with vienna version {version}')
+    solutions = pd.read_csv(infile, sep='\t', header='infer')
+    for (_, solution) in solutions.iterrows():
+        #if strucs[i] == 'Undisclosed' or strucs[i] == 'Unsolved': continue
+        folded = fold(solution['Sample Solution'], version)
+        if folded != solution['Secondary Structure']:
+            print(f'BAD FOLDED SEQUENCE for puzzle {solution["Puzzle Name"]}: got {folded} - should be {solution["Secondary Structure"]:}')
 
-    sols1 = e100['Sample Solution'].tolist()
-    strucs = e100['Secondary Structure'].tolist()
-    names = e100['Puzzle Name'].tolist()
-
-    buggy = []
-    f = open(outfile, 'w')
-    for i in range(100):
-        struc1 = fold(sols1[i], version)
-        if struc1 != strucs[i]:
-            f.write(f'{names[i]}\t{strucs[i]}\t{sols1[i]}\t{struc1}\n')
-            buggy.append(names[i])
-        else:
-            f.write('fine\n')
+def check_sequences(
+    puzzle_infile: str,
+    solution_infile: str,
+    version: VIENNA_VERSIONS
+):
+    print(f'Checking solution file {puzzle_infile} against solution file {solution_infile} with vienna version {version}')
+    puzzles = pd.read_csv(puzzle_infile, sep='\t', header='infer')
+    solutions = pd.read_csv(solution_infile, sep='\t', header='infer')
     
-    f.close()
-
-    print(f'Number of buggy sequences: {len(buggy)}')
-    print(buggy)
-
-
-def check_identical_structures():
-    e100 = pd.read_csv('eterna100v2_vienna2.tsv', sep='\t', header='infer')
-    rnai = pd.read_csv('rnainverse/rnai_puzzle_solutions_v2.txt', sep='\t', header=None, names=['Puzzle Name', 'Secondary Structure', 'Solution'])
-
-    # make the 'Secondary Structure' column lists
-    strucs = e100['Secondary Structure'].tolist()
-    folded_strucs = rnai['Secondary Structure'].tolist()
-    names = e100['Puzzle Name'].tolist()
-
-    # check if each structure matches the folded structure
-    for i in range(100):
-        if strucs[i] != folded_strucs[i]:
-            print(f'{names[i]}')
-
-
-def check_nemo_solutions(outfile: str = 'nemo_sanity_check.txt'):
-    nemo_solutions = pd.read_csv('hannah_files/NEMO_solutions_by_puzzle.txt', header='infer', sep='\t')
-    nemo_solutions = nemo_solutions[nemo_solutions['Vienna_version'] == 2]
-
-    # need to check that they match nemo_solutions.target_structure and the e100-v2 solutions
-
-    sols = nemo_solutions['MFE_seq_vienna2'].tolist()
-    strucs = nemo_solutions['target_structure'].tolist()
-
-    f = open(outfile, 'w')
-    buggy = []
-    f.write('Puzzle Name\tTarget Structure\tVienna2 Solution\tVienna2.1.9 Structure\tVienna2.4.8 Structure\n')
-    for i in range(len(sols)):
-        struc219 = fold(sols[i], '2.1.9')
-        struc248 = fold(sols[i], '2.4.8')
-        
-        if struc219 != strucs[i] or struc248 != strucs[i]:
-            f.write(f'{nemo_solutions.iloc[i]["puzzle_name"]}\t{strucs[i]}\t{sols[i]}\t{struc219}\t{struc248}\n')
-            print(f'{nemo_solutions.iloc[i]["puzzle_name"]}\t{strucs[i]}\t{sols[i]}\t{struc219}\t{struc248}\n')
-            buggy.append(nemo_solutions.iloc[i]["puzzle_name"])
-    
-    f.close()
-    print(f'Number of buggy sequences: {len(buggy)}')
-    print(buggy)
-
+    for (_, solution) in solutions.iterrows():
+        correct_ss = puzzles[puzzles['Puzzle Name'] == solution['Puzzle Name']]['Secondary Structure'].iloc[0]
+        if correct_ss != solution['Secondary Structure']:
+            print(f'BAD TARGET STRUCTURE for puzzle {solution["Puzzle Name"]} is {solution["Puzzle Name"]} but should be {correct_ss}')
+        folded = fold(solution['Solution'], version)
+        if folded != correct_ss:
+            print(f'BAD FOLDED SEQUENCE for puzzle {solution["Puzzle Name"]}: got {folded} - should be {correct_ss}')
 
 if __name__ == '__main__':
-    if not os.path.exists('checks'):
-        os.mkdir('checks')
-    check_sample_sequences('eterna100v1_vienna1.tsv', 'checks/v1_vienna1_sanity_check.txt', '1.8.5')
-    check_sample_sequences('eterna100v2_vienna1.tsv', 'checks/v2_vienna1_sanity_check.txt', '1.8.5')
-    check_sample_sequences('eterna100v2_vienna2.tsv', 'checks/v2_vienna2_sanity_check.txt', 'latest')
-    check_sample_sequences('eterna100v2_vienna2.tsv', 'checks/v2_vienna248_sanity_check.txt', '2.4.8')
-    check_sample_sequences('eterna100v2_vienna2.tsv', 'checks/v2_vienna219_sanity_check.txt', '2.1.9')
+    check_sample_sequences('eterna100v1_vienna1.tsv', '1.8.5')
+    check_sample_sequences('eterna100v2_vienna1.tsv', '1.8.5')
+    check_sample_sequences('eterna100v2_vienna2.tsv', 'latest')
+    check_sample_sequences('eterna100v2_vienna2.tsv', '2.4.8')
+    check_sample_sequences('eterna100v2_vienna2.tsv', '2.1.9')
+    check_sequences('eterna100v1_vienna1.tsv', 'nemo/nemo_v1_vienna1.tsv', '1.8.5')
+    check_sequences('eterna100v1_vienna1.tsv', 'nemo/nemo_v1_vienna2.tsv', '2.1.9')
+    check_sequences('eterna100v2_vienna2.tsv', 'nemo/nemo_v2_vienna1.tsv', '1.8.5')
+    check_sequences('eterna100v2_vienna2.tsv', 'nemo/nemo_v2_vienna2.tsv', '2.1.9')
+    check_sequences('eterna100v1_vienna1.tsv', 'eternabrain/eb_v1.txt', '1.8.5')
+    check_sequences('eterna100v2_vienna2.tsv', 'eternabrain/eb_v2.txt', '2.1.9')
+    check_sequences('eterna100v1_vienna1.tsv', 'learna/learna_v1_sols.txt', '1.8.5')
+    check_sequences('eterna100v2_vienna2.tsv', 'learna/learna_v2_sols.txt', '2.1.9')
+    check_sequences('eterna100v1_vienna1.tsv', 'rnainverse/rnai_puzzle_solutions_v1.txt', '1.8.5')
+    check_sequences('eterna100v2_vienna2.tsv', 'rnainverse/rnai_puzzle_solutions_v2.txt', '2.1.9')
+    check_sequences('eterna100v1_vienna1.tsv', 'sentrna/sentrna_v1_sols.txt', '1.8.5')
+    check_sequences('eterna100v2_vienna2.tsv', 'sentrna/sentrna_v2_sols.txt', '2.1.9')

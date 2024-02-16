@@ -1,3 +1,4 @@
+Puzzle Name	Secondary Structure	Solution
 Simple Hairpin	(((((......)))))	CCCCCAAAGGAGGGGG
 Arabidopsis Thaliana 6 RNA - Difficulty Level 0	(((((((....(((...........)))((((((((..(((((((((((((((((((...(((((......))))).)))))).)))))))))))))..))))))))..)))))))	CCCCCCCAAAACCCAAAAAAAGAGAGGGCCCCCCCCAAUCGCCACCCCCGGUCCACCAAACCCGCAAAAAGGCGGGAGGUGGAACCGGGGGUGGCGAAAGGGGGGGGGAGGGGGGG
 Prion Pseudoknot - Difficulty Level 0	((((((.((((....))))))).)))..........	CGCCCCAUGCGAAAACGCAGGGAGCGCAAAAAAAAA
