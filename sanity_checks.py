@@ -26,7 +26,7 @@ def check_sample_sequences(infile: str, version: VIENNA_VERSIONS):
     print(f'Checking sample solution file {infile} with vienna version {version}')
     solutions = pd.read_csv(infile, sep='\t', header='infer')
     for (_, solution) in solutions.iterrows():
-        #if strucs[i] == 'Undisclosed' or strucs[i] == 'Unsolved': continue
+        if solution['Sample Solution'] == 'Undisclosed' or solution['Sample Solution'] == 'Unsolved': continue
         folded = fold(solution['Sample Solution'], version)
         if folded != solution['Secondary Structure']:
             print(f'BAD FOLDED SEQUENCE for puzzle {solution["Puzzle Name"]}: got {folded} - should be {solution["Secondary Structure"]:}')
