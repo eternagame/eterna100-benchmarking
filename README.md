@@ -12,7 +12,7 @@ Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1
 2. Ensure the following prerequisites are installed:
   * git and git-lfs
   * Python 3.9-3.11
-  * make, gcc, and g++ (tested with gcc10 and gcc13) for retriving and compiling external dependencies (along with git)
+  * make, gcc, and g++ (tested with gcc10 and gcc13 - C++17 language feature support is required) for retriving and compiling external dependencies (along with git)
   * Anaconda/miniconda (for isolated environments and python installations necessary for each algorithm)
   * CUDA 10.0 (for retraining Eternabrain if GPU acceleration is desired)
 3. Install python dependencies via pip install -r requirements.txt
