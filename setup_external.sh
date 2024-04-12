@@ -102,6 +102,8 @@ git apply ../learna.patch
 
 conda env create -qy -p ../learna-env --file environment.yml
 
+popd
+
 # ===== SENTRNA =====
 if [ ! -d SentRNA ]; then
     git clone git clone https://github.com/jadeshi/SentRNA
@@ -110,7 +112,10 @@ else
     pushd SentRNA
     git fetch
 fi
-pushd SentRNA
 git checkout 6855a2d0734a962ffa7bf5a5833f52695644e18c
 
 conda create -qy -p ../sentrna-env python=2.7 tensorflow=1.15.0 numpy=1.16.6
+
+popd
+
+popd
