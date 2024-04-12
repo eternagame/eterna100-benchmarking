@@ -2,12 +2,35 @@
 
 [![Paper](https://img.shields.io/badge/paper-bioRxiv-a82525)](https://www.biorxiv.org/content/10.1101/2021.08.26.457839v1)
 
-This repository contains RNA design algorithm solutions for the Eterna100-V1 and Eterna100-V2.
 
-Each subdirectory has that algorithm's solutions to Eterna100-V1 and Eterna100-V2 (eternabrain/ has 2 files, one with Vienna 1 solutions and the other with Vienna 2 solutions).
+Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1 and Eterna100-V2 benchmarks
 
-`eterna100_vienna1.txt` and `eterna100_vienna2.txt` contain puzzle IDs, structures, and attempted player solutions.
+## Setup
+1. System Prequisites:
+  * Unix environment (tested on Linux, other operating systems may require alternate processes for setting up external dependencies)
+  * An available CUDA device (for retraining Eternabrain if GPU acceleration is desired)
+2. Ensure the following prerequisites are installed:
+  * git and git-lfs
+  * Python 3.9-3.11
+  * make, gcc, and g++ (tested with gcc10 and gcc13) for retriving and compiling external dependencies (along with git)
+  * Anaconda/miniconda (for isolated environments and python installations necessary for each algorithm)
+  * CUDA 10.0 (for retraining Eternabrain if GPU acceleration is desired)
+3. Install python dependencies via pip install -r requirements.txt
+4. Prep external libraries with setup_external.sh
 
-`eterna100-v2-19-pids.txt` contains puzzle IDs for the original and new 19 redesigned puzzles that weren't solvable in Vienna 1. `eterna100-v2-19-solutions.csv` contains player solutions for each of the IDs in `eterna100-v2-19-pids.txt`.
+## Organization
 
-`scripts/` contains information on how to reproduce these results for every algorithm.
+`data/eterna100_puzzles.tsv`: Metadata for the Eterna100-V1 and Eterna100-V2 benchmarks
+
+`data/partials/`: Output location for individual algorithm trials
+
+`external/`: External dependencies
+
+`scripts/algorithms`: Modules for benchmarking individual algorithms
+
+`scripts/benchmark.py`: Script to run algorithm benchmarks in a variety of configurations
+
+## Usage
+
+* To retrain machine learning models, run `train.sh`
+* To benchmark an algorithm in a particular configuration, run `scripts/benchmark.py` (Run `benchmark.py -h` for full usage information)

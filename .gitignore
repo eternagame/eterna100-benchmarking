@@ -1,1 +1,11 @@
-*.ps
+# External dependencies
+/external/*
+!/external/*.patch
+
+# Caches
+__pycache__/
+/data/partials/
+rna.ps
+
+# Editors
+.vscode/
