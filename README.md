@@ -8,13 +8,13 @@ Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1
 ## Setup
 1. System Prequisites:
   * Unix environment (tested on Linux, other operating systems may require alternate processes for setting up external dependencies)
-  * An available CUDA device (for retraining Eternabrain if GPU acceleration is desired)
+  * An available CUDA device, Turing generation or earlier (for retraining Eternabrain if GPU acceleration is desired)
 2. Ensure the following prerequisites are installed:
   * git and git-lfs
   * Python 3.9-3.11
   * make, gcc, and g++ (tested with gcc10 and gcc13 - C++17 language feature support is required) for retriving and compiling external dependencies (along with git)
   * Anaconda/miniconda (for isolated environments and python installations necessary for each algorithm)
-  * CUDA 10.0 (for retraining Eternabrain if GPU acceleration is desired)
+  * CUDA 10.0 and cuDNN 7.4+ (for retraining Eternabrain if GPU acceleration is desired)
 3. Install python dependencies via pip install -r requirements.txt
 4. Prep external libraries with setup_external.sh
 
