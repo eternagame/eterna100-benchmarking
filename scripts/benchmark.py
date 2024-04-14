@@ -1,19 +1,21 @@
-import os
 import argparse
 import time
-import pandas as pd
+from collections import OrderedDict
 from algorithms import rnainverse, nemo, learna, sentrna, eternabrain
 from util.fold import fold
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), '../data')
+solvers = [
+    'rnainverse', 'nemo-2500', 'nemo-10k',
+    'learna-pretrained', 'learna-retrained-vienna1', 'learna-retrained-vienna2',
+    'sentrna-pretrained', 'sentrna-retrained-vienna1-rnaplot', 'sentrna-retrained-vienna2-rnaplot',
+    'sentrna-retrained-vienna1-eterna', 'sentrna-retrained-vienna2-eterna',
+    'eternabrain-pretrained', 'eternabrain-pretrained-flipsap', 'eternabrain-retrained-f1-base',
+    'eternabrain-retrained-f1-base-flipsap', 'eternabrain-retrained-f2-base', 'eternabrain-retrained-f2-base-flipsap',
+    'eternabrain-retrained-f1-ext', 'eternabrain-retrained-f1-ext-flipsap', 'eternabrain-retrained-f2-ext',
+    'eternabrain-retrained-f2-ext-flipsap',
+]
 
-def run(solver, folder, structure_id, trial, timeout):
-    puzzles = pd.read_csv(f'{DATA_DIR}/eterna100_puzzles.tsv', sep='\t')
-    structures = pd.concat([puzzles['Secondary Structure V1'], puzzles['Secondary Structure V2']]).unique()
-    structure = structures[structure_id]
-
-    os.makedirs(f'{DATA_DIR}/partials', exist_ok=True)
-
+def run(solver, folder, structure, timeout):
     if solver == 'rnainverse':
         solve = lambda: rnainverse.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', timeout)
     elif solver == 'nemo-2500':
@@ -59,37 +61,34 @@ def run(solver, folder, structure_id, trial, timeout):
     else:
         raise NotImplementedError(f'Invalid solver {solver}')
 
-    with open(f'{DATA_DIR}/partials/{solver}_{folder}_s{structure_id}_t{trial}.tsv', 'w') as f:
-        start = time.perf_counter()
-        solution = solve()
-        end = time.perf_counter()
-        
-        sequence = solution.pop('Sequence')
-        f.write('\t'.join(['Algorithm', 'Variant', 'Folder', 'Target Structure', 'Trial', 'Sequence', 'Folded Structure', 'Time', 'Success', *solution.keys()]) + '\n')
-        (algorithm, variant, *_) = solver.split('-', 1) + ['default']
-        if sequence != '<timeout>':
-            folded = fold(sequence, '1.8.5' if folder == 'vienna1' else '2.6.4')
-        else:
-            folded = '<timeout>'
-        f.write('\t'.join([algorithm, variant, folder, structure, trial, sequence, folded, str(end - start), '1' if structure == folded else '0', *solution.values()]) + '\n')
-        f.flush()
+    start = time.perf_counter()
+    solution = solve()
+    end = time.perf_counter()
+    
+    sequence = solution.pop('Sequence')
+    (algorithm, variant, *_) = solver.split('-', 1) + ['default']
+    if sequence != '<timeout>':
+        folded = fold(sequence, '1.8.5' if folder == 'vienna1' else '2.6.4')
+    else:
+        folded = '<timeout>'
+    
+    return {
+        'Algorithm': algorithm,
+        'Variant': variant,
+        'Folder': folder,
+        'Target Structure': structure,
+        'Sequence': sequence,
+        'Folded Structure': folded,
+        'Time': str(end - start),
+        'Success': '1' if structure == folded else '0',
+        **solution
+    }
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--solver', dest='solver', choices=[
-        'rnainverse',
-        'nemo-2500', 'nemo-10k',
-        'learna-pretrained', 'learna-retrained-vienna1', 'learna-retrained-vienna2',
-        'sentrna-pretrained', 'sentrna-retrained-vienna1-rnaplot', 'sentrna-retrained-vienna2-rnaplot',
-        'sentrna-retrained-vienna1-eterna', 'sentrna-retrained-vienna2-eterna',
-        'eternabrain-pretrained', 'eternabrain-pretrained-flipsap', 'eternabrain-retrained-f1-base',
-        'eternabrain-retrained-f1-base-flipsap', 'eternabrain-retrained-f2-base', 'eternabrain-retrained-f2-base-flipsap',
-        'eternabrain-retrained-f1-ext', 'eternabrain-retrained-f1-ext-flipsap', 'eternabrain-retrained-f2-ext',
-        'eternabrain-retrained-f2-ext-flipsap',
-    ], required=True)
+    parser.add_argument('--solver', dest='solver', choices=solvers, required=True)
     parser.add_argument('--folder', dest='folder', choices=['vienna1', 'vienna2'], required=True)
-    parser.add_argument('--structure_id', dest='structure_id', type=int, required=True)
-    parser.add_argument('--trial', dest='trial', type=int, required=True)
+    parser.add_argument('--structure', dest='structure', type=str, required=True)
     parser.add_argument('--timeout', dest='timeout', type=int, default=60*60*24)
     args = parser.parse_args()
-    run(args.solver, args.folder, args.structure_id, args.trial, args.timeout)
+    print(run(args.solver, args.folder, args.structure, args.timeout))
