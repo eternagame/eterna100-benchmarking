@@ -1,6 +1,6 @@
 import os
 import re
-from subprocess import PIPE, Popen, STDOUT, TimeoutExpired
+from subprocess import PIPE, Popen, STDOUT, TimeoutExpired, run
 from util.fold import VIENNA_VERSIONS
 import tempfile
 
@@ -46,3 +46,26 @@ def solve(structure: str, version: VIENNA_VERSIONS, model_path: str, timeout: in
     except TimeoutExpired:
         print(f'Meta-Learna-Adapt(v={version}, s={structure}, m={model_path}): <timeout>')
         return {'Sequence': '<timeout>'}
+
+def train(timeout: int, vienna_version: VIENNA_VERSIONS):
+    run([
+        f'{external_path}/learna-env/bin/python', '-m', 'src.learna.learn_to_design_rna',
+        '--data_dir', 'data/',
+        '--dataset', 'rfam_learn_train',
+        '--vienna_version', vienna_version,
+        '--save_path', 'models/eterna100-benchmarking/vienna-1.8.5',
+        '--timeout', str(timeout),
+        '--learning_rate', '6.442010833400271e-05',
+        '--mutation_threshold', '5',
+        '--reward_exponent', '8.932893783628236',
+        '--state_radius', '29',
+        '--conv_sizes', '11', '3',
+        '--conv_channels', '10', '3',
+        '--num_fc_layers', '1',
+        '--fc_units', '52',
+        '--batch_size', '123',
+        '--entropy_regularization', '0.00015087352506343337',
+        '--embedding_size', '2',
+        '--lstm_units', '3',
+        '--num_lstm_layers', '0'
+    ], cwd=f'{external_path}/learna')

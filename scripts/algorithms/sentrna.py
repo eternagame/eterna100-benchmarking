@@ -1,14 +1,14 @@
 import os
 import re
 import pickle
-from subprocess import PIPE, Popen, STDOUT
-from util.fold import VIENNA_VERSIONS, fold
+from subprocess import PIPE, Popen, STDOUT, run
+from util.fold import VIENNA_VERSIONS
 import tempfile
 
 external_path = os.path.join(os.path.dirname(__file__), '../../external')
 
 def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, renderer: str):
-    env = {**os.environ}
+    env = os.environ.copy()
     env['PATH'] += f':{external_path}/ViennaRNA-{version}/build/bin'
     if version == '1.8.5':
         env['PATH'] += f':{external_path}/SentRNA/SentRNA/util/ViennaRNA-1.8.5/Progs/rnaplot'
@@ -88,3 +88,24 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, renderer
         'NN Success Count': str(sum([1 if result['nn_accuracy'] == 1.0 else 0 for result in results])),
         'Refine Success Count': str(sum([1 if result['refine_accuracy'] == 1.0 else 0 for result in results])),
     }
+
+def train(version: VIENNA_VERSIONS, features: int, renderer: str, trial: int):
+    env = os.environ.copy()
+    env['PATH'] += f':{external_path}/ViennaRNA-{version}/build/bin'
+    if version == '1.8.5':
+        env['PATH'] += f':{external_path}/SentRNA/SentRNA/util/ViennaRNA-1.8.5/Progs/rnaplot'
+
+    run([
+        f'{external_path}/sentrna-env/bin/python', f'{external_path}/SentRNA/SentRNA/run.py',
+        '--mode', 'train',
+        '--input_data', f'{external_path}/SentRNA/data/train/eterna_complete_ss.pkl',
+        '--results_path', f'trial-{trial}_MI-{features}',
+        '--n_long_range_features', str(features),
+        # We could actually benefit from caching this, calculating it only once per version/renderer
+        # combo and passing --long_range_input on future runs, but generating it independently
+        # for each model we train simplifies things for now
+        # (If we wanted to do this properly, we'd probably need to patch learna to let us run that
+        # as an isolated command).
+        '--long_range_output', f'long_range_features_{trial}_MI-{features}.pkl',
+        '--renderer', renderer
+    ], cwd=f'{external_path}/SentRNA/models/eterna100-benchmarking/vienna-{version}-{renderer}', env=env)

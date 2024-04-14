@@ -40,14 +40,14 @@ def run(solver, folder, structure_id, trial, timeout):
         solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '1.8.5' if folder == 'vienna1' else '2.6.4', 'CNN15', timeout)
     elif solver == 'eternabrain-pretrained-flipsap':
         solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '2.6.4' if folder == 'vienna1' else '1.8.5', 'CNN15', timeout)
-    elif solver == 'eternabrain-retrained-f1-sm':
-        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking-F1-SM', timeout)
-    elif solver == 'eternabrain-retrained-f1-sm-flipsap':
-        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '2.6.4' if folder == 'vienna1' else '1.8.5', 'eterna100-benchmarking-F1-SM', timeout)
-    elif solver == 'eternabrain-retrained-f2-sm':
-        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking-F2-SM', timeout)
-    elif solver == 'eternabrain-retrained-f2-sm-flipsap':
-        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '2.6.4' if folder == 'vienna1' else '1.8.5', 'eterna100-benchmarking-F2-SM', timeout)
+    elif solver == 'eternabrain-retrained-f1-base':
+        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking-F1-BASE', timeout)
+    elif solver == 'eternabrain-retrained-f1-base-flipsap':
+        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '2.6.4' if folder == 'vienna1' else '1.8.5', 'eterna100-benchmarking-F1-BASE', timeout)
+    elif solver == 'eternabrain-retrained-f2-base':
+        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking-F2-BASE', timeout)
+    elif solver == 'eternabrain-retrained-f2-base-flipsap':
+        solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '2.6.4' if folder == 'vienna1' else '1.8.5', 'eterna100-benchmarking-F2-BASE', timeout)
     elif solver == 'eternabrain-retrained-f1-ext':
         solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking-F1-EXT', timeout)
     elif solver == 'eternabrain-retrained-f1-ext-flipsap':
@@ -82,8 +82,8 @@ if __name__ == '__main__':
         'learna-pretrained', 'learna-retrained-vienna1', 'learna-retrained-vienna2',
         'sentrna-pretrained', 'sentrna-retrained-vienna1-rnaplot', 'sentrna-retrained-vienna2-rnaplot',
         'sentrna-retrained-vienna1-eterna', 'sentrna-retrained-vienna2-eterna',
-        'eternabrain-pretrained', 'eternabrain-pretrained-flipsap', 'eternabrain-retrained-f1-sm',
-        'eternabrain-retrained-f1-sm-flipsap', 'eternabrain-retrained-f2-sm', 'eternabrain-retrained-f2-sm-flipsap',
+        'eternabrain-pretrained', 'eternabrain-pretrained-flipsap', 'eternabrain-retrained-f1-base',
+        'eternabrain-retrained-f1-base-flipsap', 'eternabrain-retrained-f2-base', 'eternabrain-retrained-f2-base-flipsap',
         'eternabrain-retrained-f1-ext', 'eternabrain-retrained-f1-ext-flipsap', 'eternabrain-retrained-f2-ext',
         'eternabrain-retrained-f2-ext-flipsap',
     ], required=True)

@@ -102,6 +102,12 @@ git apply ../learna.patch
 
 conda env create -qy -p ../learna-env --file environment.yml
 
+./src/data/download_and_build_rfam_learn.sh
+mv data/rfam_learn/test data/rfam_learn_test
+mv data/rfam_learn/validation data/rfam_learn_validation
+mv data/rfam_learn/train data/rfam_learn_train
+rm -rf data/rfam_learn
+
 popd
 
 # ===== SENTRNA =====
@@ -115,6 +121,11 @@ fi
 git checkout 6855a2d0734a962ffa7bf5a5833f52695644e18c
 
 conda create -qy -p ../sentrna-env python=2.7 tensorflow=1.15.0 numpy=1.16.6
+
+mkdir -p models/eterna100-benchmarking/vienna-1.8.5-rnaplot
+mkdir -p models/eterna100-benchmarking/vienna-2.6.4-rnaplot
+mkdir -p models/eterna100-benchmarking/vienna-1.8.5-eterna
+mkdir -p models/eterna100-benchmarking/vienna-2.6.4-eterna
 
 popd
 

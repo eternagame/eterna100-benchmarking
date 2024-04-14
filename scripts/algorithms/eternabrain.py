@@ -1,12 +1,12 @@
 import os
 import re
-from subprocess import PIPE, Popen, STDOUT, TimeoutExpired
+from subprocess import PIPE, Popen, STDOUT, TimeoutExpired, run
 from util.fold import VIENNA_VERSIONS
 
 external_path = os.path.join(os.path.dirname(__file__), '../../external')
 
 def solve(structure: str, cnn_version: VIENNA_VERSIONS, sap_version: VIENNA_VERSIONS, model_name: str, timeout: int):
-    env = {**os.environ}
+    env = os.environ.copy()
     env['VIENNA_BIN_PATH'] = f'{external_path}/ViennaRNA-{cnn_version}/build/bin'
     env['SAP_VIENNA_BIN_PATH'] = f'{external_path}/ViennaRNA-{sap_version}/build/bin'
     env['MODEL_NAME'] = model_name
@@ -43,3 +43,29 @@ def solve(structure: str, cnn_version: VIENNA_VERSIONS, sap_version: VIENNA_VERS
     except TimeoutExpired:
         print(f'eternabrain-sap(cv={cnn_version}, sv={sap_version}, m={model_name}, s={structure}): <timeout>')
         return {'Sequence': '<timeout>'}
+
+def featuregen(version: VIENNA_VERSIONS):
+    env = os.environ.copy()
+    env['VIENNA_BIN_PATH'] = f'{external_path}/ViennaRNA-{version}/build/bin'
+    if version.startswith('1'):
+        env['FEATURESET_NAME'] = f'Vienna1'
+    else:
+        env['FEATURESET_NAME'] = f'Vienna2'
+
+    run(
+        [f'{external_path}/eternabrain-env/bin/python', 'experts.py'],
+        cwd=f'{external_path}/eternabrain/rna-prediction',
+        env=env
+    )
+
+def train(feature_version: int, extended: bool, model: str):
+    env = os.environ.copy()
+    env['FEATURESET_NAME'] = f'Vienna{feature_version}'
+    env['TRAIN_EXTENDED_PUZZLES'] = 'true' if extended else 'false'
+    env['MODEL_NAME'] = f'eterna100-benchmarking-F{feature_version}-{"EXT" if extended else "BASE"}'
+
+    run(
+        [f'{external_path}/eternabrain-env/bin/python', f'{model}.py'],
+        cwd=f'{external_path}/eternabrain/rna-prediction',
+        env=env
+    )
