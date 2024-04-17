@@ -5,6 +5,7 @@
 # Caches
 __pycache__/
 /data/partials/
+/data/slurm/
 rna.ps
 
 # Editors
