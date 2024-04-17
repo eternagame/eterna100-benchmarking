@@ -35,7 +35,7 @@ def sbatch(
         args.append(f'--cpus-per-task={cpus}')
     
     if gpus is not None:
-        args.append(f'--cpus-per-task={gpus}')
+        args.append(f'--gpus-per-task={gpus}')
 
     if memory is not None:
         args.append(f'--mem={memory}')
