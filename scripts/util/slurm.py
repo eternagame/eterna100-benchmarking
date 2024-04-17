@@ -55,7 +55,7 @@ def sbatch(
     if constraint is not None:
         args.append(f'-C "{constraint}"')
 
-    input = ('#!/bin/sh' + (commands if isinstance(commands, str) else '\n'.join(commands)))
+    input = ('#!/bin/sh\n\n' + (commands if isinstance(commands, str) else '\n'.join(commands)))
 
     if os.environ['SLURM_DRY_RUN'] == 'true':
         print(f'SBATCH STDIN:\n{input}\n-------')
