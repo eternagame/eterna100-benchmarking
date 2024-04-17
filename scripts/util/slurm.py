@@ -57,6 +57,11 @@ def sbatch(
 
     input = ('#!/bin/sh' + (commands if isinstance(commands, str) else '\n'.join(commands)))
 
-    res = run(args, input=input, text=True, cwd=root_path, capture_output=True)
-    # Return job ID of queued job
-    return re.search(r'\d+', res.stdout)[0]
+    if os.environ['SLURM_DRY_RUN'] == 'true':
+        print(f'SBATCH STDIN:\n{input}\n-------')
+        print(f'SBATCH COMMAND: {args}\n--------------')
+        return 0
+    else:
+        res = run(args, input=input, text=True, cwd=root_path, capture_output=True)
+        # Return job ID of queued job
+        return re.search(r'\d+', res.stdout)[0]
