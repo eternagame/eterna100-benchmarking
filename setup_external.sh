@@ -105,9 +105,16 @@ git apply ../learna.patch
 conda env create -qy -p ../learna-env --file environment.yml
 
 ./src/data/download_and_build_rfam_learn.sh
-mv data/rfam_learn/test data/rfam_learn_test
-mv data/rfam_learn/validation data/rfam_learn_validation
-mv data/rfam_learn/train data/rfam_learn_train
+
+if [ ! -d data/rfam_learn_test ]; then
+    mv data/rfam_learn/test data/rfam_learn_test
+fi
+if [ ! -d data/rfam_learn_validation ]; then
+    mv data/rfam_learn/validation data/rfam_learn_validation
+fi
+if [ ! -d data/rfam_learn_train ]; then
+    mv data/rfam_learn/train data/rfam_learn_train
+fi
 rm -rf data/rfam_learn
 
 popd
