@@ -114,7 +114,7 @@ popd
 
 # ===== SENTRNA =====
 if [ ! -d SentRNA ]; then
-    git clone git clone https://github.com/jadeshi/SentRNA
+    git clone https://github.com/jadeshi/SentRNA
     pushd SentRNA
 else
     pushd SentRNA
