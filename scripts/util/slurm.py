@@ -55,7 +55,7 @@ def sbatch(
     if constraint is not None:
         args.append(f'-C "{constraint}"')
 
-    input = '#!/bin/sh' + (input if isinstance(commands, str) else '\n'.join(commands))
+    input = '#!/bin/sh' + (commands if isinstance(commands, str) else '\n'.join(commands))
 
     res = run(args, input=input, cwd=root_path, capture_output=True)
     # Return job ID of queued job
