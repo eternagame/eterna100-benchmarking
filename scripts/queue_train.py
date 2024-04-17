@@ -134,7 +134,7 @@ if __name__ == '__main__':
     parser.add_argument('--learna-train-timeout', type=int, dest='learna_train_timeout', default=3600)
     
     parser.add_argument('--sentrna-vienna-version', type=str, dest='sentrna_vienna_version', choices=['1.8.5', '2.6.4'], default=None)
-    parser.add_argument('--sentrna-renderer', type=str, dest='sentrna_renderer', choices=['eterna', 'rnaplot'])
+    parser.add_argument('--sentrna-renderer', type=str, dest='sentrna_renderer', choices=['eterna', 'rnaplot'], default=None)
     parser.add_argument('--sentrna-trial', type=int, dest='sentrna_trial', default=None)
     parser.add_argument('--sentrna-features', type=int, dest='sentrna_features', default=None)
 
