@@ -59,4 +59,4 @@ def sbatch(
 
     res = run(args, input=input, text=True, cwd=root_path, capture_output=True)
     # Return job ID of queued job
-    return re.search(r'\d+', res.stdout.decode())[0]
+    return re.search(r'\d+', res.stdout)[0]
