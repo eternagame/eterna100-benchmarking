@@ -107,7 +107,7 @@ def run(args):
                     cmds.append(f'python scripts/queue_train.py --algorithm sentrna --sentrna-vienna-version {vienna_version} --sentrna-renderer {renderer} --sentrna-trial {trial} --sentrna-features {features}',)
                 sbatch(
                     cmds,
-                    f'e100-bench-train-sentrna-batch{idx}',
+                    f'e100-bench-train-sentrna-batch{idx + 1}',
                     timeout='30:00',
                     partition=args.slurm_partition,
                     cpus=1,
