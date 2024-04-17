@@ -2,11 +2,13 @@
 /external/*
 !/external/*.patch
 
-# Caches
+# Caches/runtime
 __pycache__/
 /data/partials/
 /data/slurm/
 rna.ps
+/venv
+/.venv
 
 # Editors
 .vscode/
