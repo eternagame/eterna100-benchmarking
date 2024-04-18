@@ -108,4 +108,4 @@ def train(version: VIENNA_VERSIONS, features: int, renderer: str, trial: int):
         # as an isolated command).
         '--long_range_output', f'long_range_features_{trial}_MI-{features}.pkl',
         '--renderer', renderer
-    ], cwd=f'{external_path}/SentRNA/models/eterna100-benchmarking/vienna-{version}-{renderer}', env=env)
+    ], cwd=f'{external_path}/SentRNA/models/eterna100-benchmarking/vienna-{version}-{renderer}', env=env).check_returncode()

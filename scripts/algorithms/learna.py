@@ -68,4 +68,4 @@ def train(timeout: int, vienna_version: VIENNA_VERSIONS):
         '--embedding_size', '2',
         '--lstm_units', '3',
         '--num_lstm_layers', '0'
-    ], cwd=f'{external_path}/learna')
+    ], cwd=f'{external_path}/learna').check_returncode()

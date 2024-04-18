@@ -56,7 +56,7 @@ def featuregen(version: VIENNA_VERSIONS):
         [f'{external_path}/eternabrain-env/bin/python', 'experts.py'],
         cwd=f'{external_path}/eternabrain/rna-prediction',
         env=env
-    )
+    ).check_returncode()
 
 def train(feature_version: int, extended: bool, model: str):
     env = os.environ.copy()
@@ -68,4 +68,4 @@ def train(feature_version: int, extended: bool, model: str):
         [f'{external_path}/eternabrain-env/bin/python', f'{model}.py'],
         cwd=f'{external_path}/eternabrain/rna-prediction',
         env=env
-    )
+    ).check_returncode()
