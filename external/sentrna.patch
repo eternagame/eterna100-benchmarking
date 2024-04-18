@@ -1,0 +1,13 @@
+diff --git a/SentRNA/run.py b/SentRNA/run.py
+index a86acb7..987a0a8 100644
+--- a/SentRNA/run.py
++++ b/SentRNA/run.py
+@@ -59,7 +59,7 @@ def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_feature
+         test_accuracy = test_accuracy2
+     pickle.dump([best_model, val_solutions[best_model], val_accuracies[best_model], test_solution, test_accuracy], open('results/%s.pkl'%(results_path), 'w'))
+     os.system('mv test/%s_mini-epoch_%d* test/%s'%(results_path, best_model, results_path))
+-    os.system('rm test/*')
++    os.system('rm test/%s_mini-epoch_*')
+     return 0
+ 
+ 

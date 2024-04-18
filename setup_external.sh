@@ -127,7 +127,12 @@ else
     pushd SentRNA
     git fetch
 fi
+# In order to make sure our patch applies cleanly, throw out any prior modifications
+# We use git stash instead of git clean just in case there were intentional local modifications
+# someone wants to retrieve (the overhead incurred here should not be substantial)
+git stash -u
 git checkout 6855a2d0734a962ffa7bf5a5833f52695644e18c
+git apply ../sentrna.patch
 
 conda create -qy -p ../sentrna-env python=2.7 tensorflow=1.15.0 numpy=1.16.6
 
