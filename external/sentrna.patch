@@ -1,5 +1,5 @@
 diff --git a/SentRNA/run.py b/SentRNA/run.py
-index a86acb7..e20c33f 100644
+index a86acb7..a4a7d1c 100644
 --- a/SentRNA/run.py
 +++ b/SentRNA/run.py
 @@ -2,6 +2,8 @@ import numpy as np
@@ -32,7 +32,7 @@ index a86acb7..e20c33f 100644
  
  
  if __name__ == '__main__':
-+    os.environ['RNAPLOT_ID'] = str(time.time_ns()) + ''.join([random.choice(string.ascii_lowercase) for _ in range(6)])
++    os.environ['RNAPLOT_ID'] = str(int(round(time.time() * 1000))) + ''.join([random.choice(string.ascii_lowercase) for _ in range(6)])
 +
      parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, argument_default=argparse.SUPPRESS)
      parser.add_argument('--mode', type=str, default='train', help='Either "train", "test", or "refine"')
