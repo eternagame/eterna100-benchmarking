@@ -22,8 +22,8 @@ def sbatch(
     args = ['sbatch']
 
     if job_name is not None:
-        args.append(f'--job-name="{job_name}"')
-        args.append(f'--output="data/slurm/%j-{job_name}"')
+        args.append(f'--job-name={job_name}')
+        args.append(f'--output=data/slurm/%j-{job_name}')
     
     if timeout is not None:
         args.append(f'--time={timeout}')
@@ -53,7 +53,7 @@ def sbatch(
         args.append(f'--mail-type={mail_type}')
     
     if constraint is not None:
-        args.append(f'-C "{constraint}"')
+        args.append(f'--constraint={constraint}')
 
     input = ('#!/bin/sh\n\n' + (commands if isinstance(commands, str) else '\n'.join(commands)))
 
