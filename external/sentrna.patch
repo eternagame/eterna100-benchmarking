@@ -1,5 +1,5 @@
 diff --git a/SentRNA/run.py b/SentRNA/run.py
-index a86acb7..a4a7d1c 100644
+index a86acb7..400a178 100644
 --- a/SentRNA/run.py
 +++ b/SentRNA/run.py
 @@ -2,6 +2,8 @@ import numpy as np
@@ -42,19 +42,26 @@ index a86acb7..a4a7d1c 100644
          refine(input_data, args.results_path, args.n_trajs, args.n_steps, move_set, args.refine_puzzle_name)
      # Removing unnecessary files generated during run
 -    os.system('rm input rna.ps') 
-+    os.system('rm input ' + os.environ['RNAPLOT_ID'] + '_ss.ps') 
++    os.system('rm input' + os.environ['RNAPLOT_ID'] + ' ' + os.environ['RNAPLOT_ID'] + '_ss.ps')
 diff --git a/SentRNA/util/featurize_util.py b/SentRNA/util/featurize_util.py
-index 95817a4..b0857a1 100644
+index 95817a4..e89c7a5 100644
 --- a/SentRNA/util/featurize_util.py
 +++ b/SentRNA/util/featurize_util.py
-@@ -90,6 +90,7 @@ def generate_label(base):
+@@ -89,11 +89,12 @@ def generate_label(base):
+ # Data parsing functions
  def generate_2d(dot_bracket):
    '''Generate a 2d representation of a dot bracket string and puzzle solution.'''
-   inputs = open('input', 'w')
+-  inputs = open('input', 'w')
++  inputs = open('input' + os.environ['RNAPLOT_ID'], 'w')
 +  inputs.write('> ' + os.environ['RNAPLOT_ID'] + '\n')
    inputs.write('A' * len(dot_bracket) + '\n')
    inputs.write(dot_bracket)
    inputs.close()
+-  os.system('RNAplot < input')
++  os.system('RNAplot < input' + os.environ['RNAPLOT_ID'])
+ 
+ 
+ def parse_ps(ps):
 @@ -141,7 +142,7 @@ def parse_ps(ps):
  # RNAplot
  def draw_structure_rnaplot(dot_bracket):
