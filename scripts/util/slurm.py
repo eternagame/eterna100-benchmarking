@@ -64,4 +64,7 @@ def sbatch(
     else:
         res = run(args, input=input, text=True, cwd=root_path, capture_output=True)
         # Return job ID of queued job
-        return re.search(r'\d+', res.stdout)[0]
+        match = re.search(r'Submitted batch job (\d+)', res.stdout)
+        if match is None:
+            raise Exception(f'sbatch did not return job id.\nstdout\n{res.stdout}\nstderr\n{res.stderr}')
+        return match.group(1)
