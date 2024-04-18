@@ -57,7 +57,7 @@ def sbatch(
 
     input = ('#!/bin/sh\n\n' + (commands if isinstance(commands, str) else '\n'.join(commands)))
 
-    if os.environ['SLURM_DRY_RUN'] == 'true':
+    if os.environ.get('SLURM_DRY_RUN') == 'true':
         print(f'SBATCH STDIN:\n{input}\n-------')
         print(f'SBATCH COMMAND: {args}\n--------------')
         return 0
