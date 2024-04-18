@@ -67,7 +67,7 @@ def run(args):
                         gpus=1,
                         # We need to limit ourselves to GPU generations Turning or older due to the CUDA
                         # version required by Eternabrain's version of tensorflow 
-                        constraint='GPU_GEN:MXW|GPU_GEN:PSC|GPU_GEN:VLT|GPU_GEN:TUR',
+                        constraint='GPU_GEN:PSC|GPU_GEN:VLT|GPU_GEN:TUR',
                         dependency=dependency,
                         mail_type='END,FAIL',
                     )
