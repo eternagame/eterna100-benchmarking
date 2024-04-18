@@ -101,14 +101,14 @@ def run(args):
             )
         )
         if args.scheduler == 'slurm':
-            for (idx, batch) in enumerate(grouper(sentrna_configs, 5)):
+            for (idx, batch) in enumerate(grouper(sentrna_configs, 20)):
                 cmds = []
                 for (vienna_version, renderer, (trial, features)) in [conf for conf in batch if conf != None]:
                     cmds.append(f'python scripts/queue_train.py --algorithm sentrna --sentrna-vienna-version {vienna_version} --sentrna-renderer {renderer} --sentrna-trial {trial} --sentrna-features {features}',)
                 sbatch(
                     cmds,
                     f'e100-bench-train-sentrna-batch{idx + 1}',
-                    timeout='30:00',
+                    timeout='2:00:00',
                     partition=args.slurm_partition,
                     cpus=1,
                     mail_type='END,FAIL'
