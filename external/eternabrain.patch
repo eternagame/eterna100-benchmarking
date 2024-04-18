@@ -9,7 +9,7 @@ index 3f17530..978c0a1 100644
  numpy>=1.12.1
  seaborn>=0.7.1
 diff --git a/rna-prediction/baseCNN.py b/rna-prediction/baseCNN.py
-index 3a0244d..fa24370 100644
+index 3a0244d..f5025dd 100644
 --- a/rna-prediction/baseCNN.py
 +++ b/rna-prediction/baseCNN.py
 @@ -14,7 +14,8 @@ import pickle
@@ -62,11 +62,10 @@ index 3a0244d..fa24370 100644
          for i in range(len(feats)):
              feats[i].append(yloc[i])
          real_X.extend(feats)
-@@ -91,19 +93,7 @@ for i in indxs:
-          for j in pids[i]:
+@@ -92,18 +94,6 @@ for i in indxs:
               for k in j:
                   k.extend([0]*(abs_max - len(k))) #k.extend([0]*(max(max_lens) - len(k)))
--
+ 
 -#print abs_max
 -
 -'''
@@ -79,7 +78,6 @@ index 3a0244d..fa24370 100644
 -print(len(real_X), len(real_y))
 -print(np.array(real_X).shape, np.array(real_y).shape)
 -
-+/pickles/
  '''
  Uncomment for altering training data (training on half experts)
  '''
