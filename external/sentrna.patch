@@ -1,16 +1,17 @@
 diff --git a/SentRNA/run.py b/SentRNA/run.py
-index a86acb7..8a5d35a 100644
+index a86acb7..e20c33f 100644
 --- a/SentRNA/run.py
 +++ b/SentRNA/run.py
-@@ -2,6 +2,7 @@ import numpy as np
+@@ -2,6 +2,8 @@ import numpy as np
  import random
  import os
  import pickle
 +import time
++import string
  from util.compute_mfe import *
  from util.draw_rna import *
  from util.mutinf import *
-@@ -10,7 +11,6 @@ import argparse
+@@ -10,7 +12,6 @@ import argparse
  from util.featurize_util import *
  from util.feedforward import *
  
@@ -18,7 +19,7 @@ index a86acb7..8a5d35a 100644
  def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_features_list, nn_training_dataset, val_dataset, test_dataset, MI_tolerance, renderer):
      # Model params
      input_size = len(nn_training_dataset[0][0])
-@@ -59,7 +59,7 @@ def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_feature
+@@ -59,7 +60,7 @@ def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_feature
          test_accuracy = test_accuracy2
      pickle.dump([best_model, val_solutions[best_model], val_accuracies[best_model], test_solution, test_accuracy], open('results/%s.pkl'%(results_path), 'w'))
      os.system('mv test/%s_mini-epoch_%d* test/%s'%(results_path, best_model, results_path))
@@ -27,16 +28,16 @@ index a86acb7..8a5d35a 100644
      return 0
  
  
-@@ -136,6 +136,8 @@ def refine(dataset, output_path, n_trajs, n_steps, move_set, puzzle_name):
+@@ -136,6 +137,8 @@ def refine(dataset, output_path, n_trajs, n_steps, move_set, puzzle_name):
  
  
  if __name__ == '__main__':
-+    os.environ['RNAPLOT_ID'] = str(time.time())
++    os.environ['RNAPLOT_ID'] = str(time.time_ns()) + ''.join([random.choice(string.ascii_lowercase) for _ in range(6)])
 +
      parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, argument_default=argparse.SUPPRESS)
      parser.add_argument('--mode', type=str, default='train', help='Either "train", "test", or "refine"')
      parser.add_argument('--input_data', type=str)
-@@ -230,4 +232,4 @@ if __name__ == '__main__':
+@@ -230,4 +233,4 @@ if __name__ == '__main__':
          move_set = eval(args.move_set)
          refine(input_data, args.results_path, args.n_trajs, args.n_steps, move_set, args.refine_puzzle_name)
      # Removing unnecessary files generated during run
