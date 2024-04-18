@@ -59,7 +59,7 @@ def run(args):
                             dependency = featuregen_vienna2_job
                     
                     sbatch(
-                        f'python scripts/queue_train.py --algorithm eternabrain --eternabrain-stage {stage} --eternabrain-featureset {featureset} --eternabrain_puzzleset {puzzleset}',
+                        f'python scripts/queue_train.py --algorithm eternabrain --eternabrain-stage {stage} --eternabrain-featureset {featureset} --eternabrain-puzzleset {puzzleset}',
                         f'e100-bench-train-eternabrain-{stage}-{featureset}-{puzzleset}',
                         timeout='6:00:00',
                         partition=args.slurm_gpu_partition,
