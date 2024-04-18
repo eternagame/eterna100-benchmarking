@@ -83,7 +83,7 @@ def run(args):
             if args.scheduler == 'slurm':
                     sbatch(
                         f'python scripts/queue_train.py --algorithm learna --learna-vienna-version {vienna_version} --learna-train-timeout {args.learna_train_timeout}',
-                        f'e100-bench-train-eternabrain-{stage}-{featureset}-{puzzleset}',
+                        f'e100-bench-train-learna-{vienna_version}',
                         timeout='1:30:00',
                         partition=args.slurm_partition,
                         cpus=20,
