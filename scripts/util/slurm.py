@@ -23,7 +23,7 @@ def sbatch(
 
     if job_name is not None:
         args.append(f'--job-name={job_name}')
-        args.append(f'--output=data/slurm/%j-{job_name}')
+        args.append(f'--output=data/slurm/%j-{job_name}.txt')
     
     if timeout is not None:
         args.append(f'--time={timeout}')
