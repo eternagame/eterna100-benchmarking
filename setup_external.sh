@@ -74,6 +74,7 @@ else
     pushd eternabrain
     git fetch
 fi
+echo "rna-prediction/models/*/*eterna100-benchmarking**" > .git/info/exclude
 # In order to make sure our patch applies cleanly, throw out any prior modifications
 # We use git stash instead of git clean just in case there were intentional local modifications
 # someone wants to retrieve (the overhead incurred here should not be substantial)
@@ -95,6 +96,7 @@ else
     pushd learna
     git fetch
 fi
+echo "models/eterna100-benchmarking" > .git/info/exclude
 # In order to make sure our patch applies cleanly, throw out any prior modifications
 # We use git stash instead of git clean just in case there were intentional local modifications
 # someone wants to retrieve (the overhead incurred here should not be substantial)
@@ -127,6 +129,7 @@ else
     pushd SentRNA
     git fetch
 fi
+echo "models/eterna100-benchmarking" > .git/info/exclude
 # In order to make sure our patch applies cleanly, throw out any prior modifications
 # We use git stash instead of git clean just in case there were intentional local modifications
 # someone wants to retrieve (the overhead incurred here should not be substantial)
