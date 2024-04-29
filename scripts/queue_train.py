@@ -98,7 +98,7 @@ def run(args):
             [args.sentrna_vienna_version] if args.sentrna_vienna_version is not None else ['1.8.5', '2.6.4'],
             [args.sentrna_renderer] if args.sentrna_renderer is not None else ['eterna', 'rnaplot'],
             [(args.sentrna_trial, args.sentrna_features)] if args.sentrna_trial is not None else (
-                list(product([0], range(0, 42))) + list(list(product(range(1, 19), [0]))) + list(list(product(range(1, 19), [20]))) + list(list(product(range(1, 19), [42])))
+                list(product([0], range(0, 43))) + list(list(product(range(1, 20), [0]))) + list(list(product(range(1, 20), [20]))) + list(list(product(range(1, 20), [42])))
             )
         )
         if args.scheduler == 'slurm':
