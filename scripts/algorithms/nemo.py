@@ -18,7 +18,13 @@ def solve(structure: str, vienna_version: Literal['1', '2'], iterations: int, ti
         print(f'nemo(v={vienna_version}, i={iterations}, s={structure}): {clean_res}')
         
         match = re.search(r'NMC: ([AUGC]+).*\nSTR: ([\(\).]+)', res)
-        return {'Sequence': match.group(1), 'Returned Structure': match.group(2)}
+        return {
+            'Sequence': match.group(1),
+            'Returned Structure': match.group(2),
+        }
     except TimeoutExpired:
         print(f'nemo(v={vienna_version}, i={iterations}, s={structure}): <timeout>')
-        return {'Sequence': '<timeout>'}
+        return {
+            'Sequence': '<timeout>',
+            'Returned Structure': '',
+        }

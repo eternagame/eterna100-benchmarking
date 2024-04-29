@@ -42,10 +42,18 @@ def solve(structure: str, version: VIENNA_VERSIONS, model_path: str, timeout: in
         print(f'Meta-Learna-Adapt(v={version}, s={structure}, m={model_path}): {clean_res}')
 
         (elapsed_time, last_reward, last_fractional_hamming, candidate_solution) = res.split('\n')[-1].split(' ')
-        return {'Sequence': candidate_solution, 'Last Reward': last_reward, 'Last Fractional Hamming': last_fractional_hamming}
+        return {
+            'Sequence': candidate_solution,
+            'Last Reward': last_reward,
+            'Last Fractional Hamming': last_fractional_hamming,
+        }
     except TimeoutExpired:
         print(f'Meta-Learna-Adapt(v={version}, s={structure}, m={model_path}): <timeout>')
-        return {'Sequence': '<timeout>'}
+        return {
+            'Sequence': '<timeout>',
+            'Last Reward': '',
+            'Last Fractional Hamming': '',
+        }
 
 def train(timeout: int, vienna_version: VIENNA_VERSIONS):
     run([

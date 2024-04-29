@@ -99,7 +99,14 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, renderer
         }
     except TimeoutExpired:
         print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, r={renderer}): <timeout>')
-        return {'Sequence': '<timeout>'}
+        return {
+            'Sequence': '<timeout>',
+            'Accuracy': '',
+            'NN Accuracies': '',
+            'Refine Accuracies': '',
+            'NN Success Count': '',
+            'Refine Success Count': '',
+        }
 
 def train(version: VIENNA_VERSIONS, features: int, renderer: str, trial: int):
     env = os.environ.copy()
