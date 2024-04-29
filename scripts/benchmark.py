@@ -1,6 +1,5 @@
 import argparse
 import time
-from collections import OrderedDict
 from algorithms import rnainverse, nemo, learna, sentrna, eternabrain
 from util.fold import fold
 
@@ -29,15 +28,15 @@ def run(solver, folder, structure, timeout):
     elif solver == 'learna-retrained-vienna2':
         solve = lambda: learna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-2.6.4', timeout)
     elif solver == 'sentrna-pretrained':
-        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'trained_models/batch1', 'rnaplot')
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'trained_models/batch1', 'rnaplot', timeout)
     elif solver == 'sentrna-retrained-vienna1-rnaplot':
-        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-rnaplot', 'rnaplot')
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-rnaplot', 'rnaplot', timeout)
     elif solver == 'sentrna-retrained-vienna1-eterna':
-        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-eterna', 'eterna')
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-eterna', 'eterna', timeout)
     elif solver == 'sentrna-retrained-vienna2-rnaplot':
-        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-rnaplot', 'rnaplot')
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-rnaplot', 'rnaplot', timeout)
     elif solver == 'sentrna-retrained-vienna2-eterna':
-        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-eterna', 'eterna')
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-eterna', 'eterna', timeout)
     elif solver == 'eternabrain-pretrained':
         solve = lambda: eternabrain.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', '1.8.5' if folder == 'vienna1' else '2.6.4', 'CNN15', timeout)
     elif solver == 'eternabrain-pretrained-flipsap':

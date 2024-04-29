@@ -32,7 +32,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, model_path: str, timeout: in
                 '--restart_timeout', '1800',
                 '--vienna_version', version,
             ], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8', cwd=f'{external_path}/learna')
-            res = p.communicate(input=structure)[0].strip()
+            res = p.communicate(input=structure, timeout=timeout)[0].strip()
         
         trimmed_res = re.sub(r'.+(Your CPU supports instructions|FutureWarning: Passing \(type, 1\)[^\n]+\n\s+ (_np_q|np_resource)|RuntimeWarning: compiletime version.+of module.+fast_tensor_util[^\n]+\n\s+return f)[^\n]+\n', '', res)
         if len(trimmed_res) > 2500:
