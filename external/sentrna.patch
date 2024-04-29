@@ -1,23 +1,7 @@
 diff --git a/SentRNA/run.py b/SentRNA/run.py
-index a86acb7..cb384e8 100644
+index a86acb7..f9e3523 100644
 --- a/SentRNA/run.py
 +++ b/SentRNA/run.py
-@@ -2,6 +2,7 @@ import numpy as np
- import random
- import os
- import pickle
-+import string
- from util.compute_mfe import *
- from util.draw_rna import *
- from util.mutinf import *
-@@ -10,7 +11,6 @@ import argparse
- from util.featurize_util import *
- from util.feedforward import *
- 
--
- def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_features_list, nn_training_dataset, val_dataset, test_dataset, MI_tolerance, renderer):
-     # Model params
-     input_size = len(nn_training_dataset[0][0])
 @@ -59,7 +59,7 @@ def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_feature
          test_accuracy = test_accuracy2
      pickle.dump([best_model, val_solutions[best_model], val_accuracies[best_model], test_solution, test_accuracy], open('results/%s.pkl'%(results_path), 'w'))
@@ -27,46 +11,47 @@ index a86acb7..cb384e8 100644
      return 0
  
  
-@@ -136,6 +136,8 @@ def refine(dataset, output_path, n_trajs, n_steps, move_set, puzzle_name):
- 
- 
- if __name__ == '__main__':
-+    os.environ['RNAPLOT_ID'] = ''.join([random.choice(string.ascii_lowercase) for _ in range(10)])
-+
-     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, argument_default=argparse.SUPPRESS)
-     parser.add_argument('--mode', type=str, default='train', help='Either "train", "test", or "refine"')
-     parser.add_argument('--input_data', type=str)
-@@ -230,4 +232,4 @@ if __name__ == '__main__':
-         move_set = eval(args.move_set)
-         refine(input_data, args.results_path, args.n_trajs, args.n_steps, move_set, args.refine_puzzle_name)
-     # Removing unnecessary files generated during run
--    os.system('rm input rna.ps') 
-+    os.system('rm input' + os.environ['RNAPLOT_ID'] + ' ' + os.environ['RNAPLOT_ID'] + '_ss.ps')
 diff --git a/SentRNA/util/featurize_util.py b/SentRNA/util/featurize_util.py
-index 95817a4..e89c7a5 100644
+index 95817a4..aaf4564 100644
 --- a/SentRNA/util/featurize_util.py
 +++ b/SentRNA/util/featurize_util.py
-@@ -89,11 +89,12 @@ def generate_label(base):
+@@ -1,5 +1,7 @@
+ import numpy as np
+ import os
++import subprocess
++import tempfile
+ from mutinf import *
+ from compute_mfe import *
+ import random
+@@ -89,12 +91,19 @@ def generate_label(base):
  # Data parsing functions
  def generate_2d(dot_bracket):
    '''Generate a 2d representation of a dot bracket string and puzzle solution.'''
--  inputs = open('input', 'w')
-+  inputs = open('input' + os.environ['RNAPLOT_ID'], 'w')
-+  inputs.write('> ' + os.environ['RNAPLOT_ID'] + '\n')
++  tmpdir = tempfile.mkdtemp()
++  oldcwd = os.getcwd()
++  os.chdir(tmpdir)
++
+   inputs = open('input', 'w')
    inputs.write('A' * len(dot_bracket) + '\n')
    inputs.write(dot_bracket)
    inputs.close()
--  os.system('RNAplot < input')
-+  os.system('RNAplot < input' + os.environ['RNAPLOT_ID'])
++
+   os.system('RNAplot < input')
  
++  os.chdir(oldcwd)
++  return tmpdir
  
  def parse_ps(ps):
-@@ -141,7 +142,7 @@ def parse_ps(ps):
+   '''Parses a RNAplot output file and returns:
+@@ -140,8 +149,9 @@ def parse_ps(ps):
+ 
  # RNAplot
  def draw_structure_rnaplot(dot_bracket):
-     generate_2d(dot_bracket)
+-    generate_2d(dot_bracket)
 -    coords, pairs, _ = parse_ps('rna.ps')
-+    coords, pairs, _ = parse_ps(os.environ['RNAPLOT_ID'] + '_ss.ps')
++    tmpdir = generate_2d(dot_bracket)
++    coords, pairs, _ = parse_ps(tmpdir + '/rna.ps')
++    os.system('rm -r ' + tmpdir)
      return coords, pairs
  
  # Eterna
