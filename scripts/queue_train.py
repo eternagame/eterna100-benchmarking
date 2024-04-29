@@ -61,10 +61,11 @@ def run(args):
                     sbatch(
                         f'python scripts/queue_train.py --algorithm eternabrain --eternabrain-stage {stage} --eternabrain-featureset {featureset} --eternabrain-puzzleset {puzzleset}',
                         f'e100-bench-train-eternabrain-{stage}-{featureset}-{puzzleset}',
-                        timeout='6:00:00',
+                        timeout='3:00:00',
                         partition=args.slurm_gpu_partition,
                         cpus=1,
                         gpus=1,
+                        memory_per_cpu='8GB',
                         # We need to limit ourselves to GPU generations Turning or older due to the CUDA
                         # version required by Eternabrain's version of tensorflow 
                         constraint='GPU_GEN:PSC|GPU_GEN:VLT|GPU_GEN:TUR',
@@ -108,7 +109,7 @@ def run(args):
                 sbatch(
                     cmds,
                     f'e100-bench-train-sentrna-batch{idx + 1}',
-                    timeout='2:00:00',
+                    timeout='3:00:00',
                     partition=args.slurm_partition,
                     cpus=1,
                     mail_type='END,FAIL'
