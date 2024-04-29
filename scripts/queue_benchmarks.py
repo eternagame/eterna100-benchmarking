@@ -16,7 +16,7 @@ def run(args):
     for (solver, folder, (structure_id, structure), trial) in product(
         [args.solver] if args.solver is not None else solvers,
         [args.folder] if args.folder is not None else ['vienna1', 'vienna2'],
-        [[args.structure_id, args.structure]] if args.structure is not None else enumerate(structures),
+        [[args.structure_id, args.structure]] if args.structure is not None else enumerate(structures, 1),
         [args.trial] if args.trial is not None else range(args.trials)
     ):
         res = run_benchmark(solver, folder, structure, args.timeout)
