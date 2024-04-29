@@ -9,7 +9,7 @@ index 3f17530..978c0a1 100644
  numpy>=1.12.1
  seaborn>=0.7.1
 diff --git a/rna-prediction/baseCNN.py b/rna-prediction/baseCNN.py
-index 3a0244d..f5025dd 100644
+index 3a0244d..0e4ba45 100644
 --- a/rna-prediction/baseCNN.py
 +++ b/rna-prediction/baseCNN.py
 @@ -14,7 +14,8 @@ import pickle
@@ -22,6 +22,15 @@ index 3a0244d..f5025dd 100644
  NUM_FEATURES = 9
  TRAIN_KEEP_PROB = 0.9
  TEST_KEEP_PROB = 1.0
+@@ -22,7 +23,7 @@ learning_rate = 0.0001
+ ne = 150
+ tb_path = '/tensorboard/' + NAME
+ 
+-train = 30000
++# train = 30000
+ test = 100
+ abs_max = 400
+ len_puzzle = abs_max
 @@ -39,25 +40,26 @@ with open(os.getcwd()+'/movesets/teaching-puzzle-ids.txt') as f:
  # you may also want to remove whitespace characters like `\n` at the end of each line
  content = [x.strip() for x in content]
@@ -81,6 +90,15 @@ index 3a0244d..f5025dd 100644
  '''
  Uncomment for altering training data (training on half experts)
  '''
+@@ -133,7 +123,7 @@ The first '#' statement is for half experts, the second is for half players
+ # print test_real_X.shape
+ # print test_real_y.shape
+ 
+-
++train = len(real_X) - test
+ real_X_9 = np.array(real_X[0:train]).reshape([-1,TF_SHAPE])
+ real_y_9 = np.array(real_y[0:train])
+ test_real_X = np.array(real_X[train:train+test]).reshape([-1,TF_SHAPE])
 diff --git a/rna-prediction/eterna_score.py b/rna-prediction/eterna_score.py
 index 8477718..33bdccb 100644
 --- a/rna-prediction/eterna_score.py
@@ -288,7 +306,7 @@ index 43969b6..0af975b 100644
  
      return e
 diff --git a/rna-prediction/locationCNN.py b/rna-prediction/locationCNN.py
-index b2d150b..9823e9a 100644
+index b2d150b..c4d29e9 100644
 --- a/rna-prediction/locationCNN.py
 +++ b/rna-prediction/locationCNN.py
 @@ -13,7 +13,8 @@ import tensorflow as tf
@@ -301,6 +319,15 @@ index b2d150b..9823e9a 100644
  NUM_FEATURES = 8
  TRAIN_KEEP_PROB = 0.9
  TEST_KEEP_PROB = 1.0
+@@ -21,7 +22,7 @@ learning_rate = 0.0001
+ ne = 150
+ tb_path = '/tensorboard/' + NAME
+ 
+-train = 30000
++# train = 30000
+ test = 100
+ abs_max = 400
+ len_puzzle = abs_max
 @@ -38,17 +39,18 @@ with open(os.getcwd()+'/movesets/teaching-puzzle-ids.txt') as f:
  # you may also want to remove whitespace characters like `\n` at the end of each line
  content = [x.strip() for x in content]
@@ -342,6 +369,24 @@ index b2d150b..9823e9a 100644
          if np.count_nonzero(np.array(feats[0])) <= 50:
              specs_X.extend(feats)
              specs_y.extend(yloc)
+@@ -141,7 +143,7 @@ The first '#' is for half experts, the second is for half players
+ # print real_y_9.shape
+ # print test_real_X.shape
+ # print test_real_y.shape
+-
++train = len(real_X) - test
+ real_X_9 = np.array(real_X[0:train]).reshape([-1,TF_SHAPE])
+ real_y_9 = np.array(real_y[0:train])
+ test_real_X = np.array(real_X[train:train+test]).reshape([-1,TF_SHAPE])
+@@ -163,7 +165,7 @@ print("Data prepped")
+ # test_ms0 = np.array([[4,20],[3,15]])
+ # test_ms0 = np.array([[0,0,0,1],[1,0,0,0]]) # just base
+ 
+-n_classes = 350
++n_classes = 400
+ batch_size = 100 # load 100 features at a time
+ 
+ x = tf.placeholder('float',[None,TF_SHAPE],name="x_placeholder") # 216 with enc0
 diff --git a/rna-prediction/predict.py b/rna-prediction/predict.py
 index 42a8a94..4181630 100644
 --- a/rna-prediction/predict.py
