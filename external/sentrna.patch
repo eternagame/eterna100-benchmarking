@@ -1,5 +1,5 @@
 diff --git a/SentRNA/run.py b/SentRNA/run.py
-index a86acb7..7f0388f 100644
+index a86acb7..cb384e8 100644
 --- a/SentRNA/run.py
 +++ b/SentRNA/run.py
 @@ -2,6 +2,7 @@ import numpy as np
@@ -23,7 +23,7 @@ index a86acb7..7f0388f 100644
      pickle.dump([best_model, val_solutions[best_model], val_accuracies[best_model], test_solution, test_accuracy], open('results/%s.pkl'%(results_path), 'w'))
      os.system('mv test/%s_mini-epoch_%d* test/%s'%(results_path, best_model, results_path))
 -    os.system('rm test/*')
-+    os.system('rm test/%s_mini-epoch_*')
++    os.system('rm test/%s_mini-epoch_*'%(results_path))
      return 0
  
  
