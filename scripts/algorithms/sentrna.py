@@ -52,7 +52,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, renderer
                 clean_res = trimmed_res.replace('\n', '\\n')
                 with open(f'{tempdir}/test_results/nn.pkl', 'rb') as f:
                     nn_output = pickle.load(f)
-                print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, m={model}, stage=NN): {clean_res} | {str(nn_output)}')
+                print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, m={model}, r={renderer}, stage=NN): {clean_res} | {str(nn_output)}')
 
                 (nn_name, nn_struct, nn_seq, nn_accuracy) = nn_output[0]
 
@@ -78,7 +78,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, renderer
                 clean_res = trimmed_res.replace('\n', '\\n')
                 with open(f'{tempdir}/refined/refine.pkl', 'rb') as f:
                     refine_output = pickle.load(f)
-                print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, m={model}, stage=REFINE): {clean_res} | {str(refine_output)}')
+                print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, m={model}, r={renderer}, stage=REFINE): {clean_res} | {str(refine_output)}')
 
                 (refine_name, refine_struct, refine_seq, refine_accuracy) = refine_output[0]
                 results.append({
@@ -98,7 +98,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, renderer
             'Refine Success Count': str(sum([1 if result['refine_accuracy'] == 1.0 else 0 for result in results])),
         }
     except TimeoutExpired:
-        print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}): <timeout>')
+        print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, r={renderer}): <timeout>')
         return {'Sequence': '<timeout>'}
 
 def train(version: VIENNA_VERSIONS, features: int, renderer: str, trial: int):
