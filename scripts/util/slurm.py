@@ -12,7 +12,7 @@ def sbatch(
     partition: str = None,
     cpus: int = None,
     gpus: int = None,
-    memory: str = None,
+    memory_per_node: str = None,
     memory_per_cpu: str = None,
     ntasks: int = None,
     dependency: str = None,
@@ -37,8 +37,8 @@ def sbatch(
     if gpus is not None:
         args.append(f'--gpus={gpus}')
 
-    if memory is not None:
-        args.append(f'--mem={memory}')
+    if memory_per_node is not None:
+        args.append(f'--mem={memory_per_node}')
     
     if memory_per_cpu is not None:
         args.append(f'--mem-per-cpu={memory_per_cpu}')
