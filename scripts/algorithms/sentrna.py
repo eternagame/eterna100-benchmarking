@@ -107,6 +107,8 @@ def train(version: VIENNA_VERSIONS, features: int, renderer: str, trial: int):
     if version == '1.8.5':
         env['PATH'] += f':{external_path}/SentRNA/SentRNA/util/ViennaRNA-1.8.5/Progs/rnaplot'
 
+    os.makedirs(f'{external_path}/SentRNA/models/eterna100-benchmarking/vienna-{version}-{renderer}', exist_ok=True)
+
     run([
         f'{external_path}/sentrna-env/bin/python', f'{external_path}/SentRNA/SentRNA/run.py',
         '--mode', 'train',

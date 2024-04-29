@@ -139,11 +139,6 @@ git apply ../sentrna.patch
 
 conda create -qy -p ../sentrna-env python=2.7 tensorflow=1.15.0 numpy=1.16.6
 
-mkdir -p models/eterna100-benchmarking/vienna-1.8.5-rnaplot
-mkdir -p models/eterna100-benchmarking/vienna-2.6.4-rnaplot
-mkdir -p models/eterna100-benchmarking/vienna-1.8.5-eterna
-mkdir -p models/eterna100-benchmarking/vienna-2.6.4-eterna
-
 popd
 
 popd
