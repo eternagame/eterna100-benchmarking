@@ -6,7 +6,8 @@ from util.fold import fold
 solvers = [
     'rnainverse', 'nemo-2500', 'nemo-10k',
     'learna-pretrained', 'learna-retrained-vienna1', 'learna-retrained-vienna2',
-    'sentrna-pretrained', 'sentrna-retrained-vienna1-rnaplot-1taf', 'sentrna-retrained-vienna1-rnaplot-20t0f',
+    'sentrna-pretrained-1taf', 'sentrna-pretrained-20t0f', 'sentrna-pretrained-20t20f', 'sentrna-pretrained-20t42f',
+    'sentrna-retrained-vienna1-rnaplot-1taf', 'sentrna-retrained-vienna1-rnaplot-20t0f',
     'sentrna-retrained-vienna1-rnaplot-20t20f', 'sentrna-retrained-vienna1-rnaplot-20t42f',
     'sentrna-retrained-vienna1-eterna-1taf', 'sentrna-retrained-vienna1-eterna-20t0f',
     'sentrna-retrained-vienna1-eterna-20t20f', 'sentrna-retrained-vienna1-eterna-20t42f',
@@ -33,8 +34,14 @@ def run(solver, folder, structure, timeout):
         solve = lambda: learna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5', timeout)
     elif solver == 'learna-retrained-vienna2':
         solve = lambda: learna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-2.6.4', timeout)
-    elif solver == 'sentrna-pretrained':
-        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'trained_models/batch1', 'rnaplot', timeout)
+    elif solver == 'sentrna-pretrained-1taf':
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'trained_models/batch1', '1trial-allfeat', 'rnaplot', timeout)
+    elif solver == 'sentrna-pretrained-20t0f':
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'trained_models/batch1', '20trials-nofeat', 'rnaplot', timeout)
+    elif solver == 'sentrna-pretrained-20t20f':
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'trained_models/batch1', '20trials-20feat', 'rnaplot', timeout)
+    elif solver == 'sentrna-pretrained-20t42f':
+        solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'trained_models/batch1', '1trial-allfeat', 'rnaplot', timeout)
     elif solver == 'sentrna-retrained-vienna1-rnaplot-1taf':
         solve = lambda: sentrna.solve(structure, '1.8.5' if folder == 'vienna1' else '2.6.4', 'eterna100-benchmarking/vienna-1.8.5-rnaplot', '1trial-allfeat', 'rnaplot', timeout)
     elif solver == 'sentrna-retrained-vienna1-rnaplot-20t0f':
