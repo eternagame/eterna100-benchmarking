@@ -51,8 +51,8 @@ def solve(structure: str, version: VIENNA_VERSIONS, model_path: str, timeout: in
         print(f'Meta-Learna-Adapt(v={version}, s={structure}, m={model_path}): <timeout>')
         return {
             'Sequence': '<timeout>',
-            'Last Reward': '',
-            'Last Fractional Hamming': '',
+            'Last Reward': '<timeout>',
+            'Last Fractional Hamming': '<timeout>',
         }
 
 def train(timeout: int, vienna_version: VIENNA_VERSIONS):

@@ -26,5 +26,5 @@ def solve(structure: str, vienna_version: Literal['1', '2'], iterations: int, ti
         print(f'nemo(v={vienna_version}, i={iterations}, s={structure}): <timeout>')
         return {
             'Sequence': '<timeout>',
-            'Returned Structure': '',
+            'Returned Structure': '<timeout>',
         }

@@ -113,11 +113,11 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
         print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, r={renderer}): <timeout>')
         return {
             'Sequence': '<timeout>',
-            'Accuracy': '',
-            'NN Accuracies': '',
-            'Refine Accuracies': '',
-            'NN Success Count': '',
-            'Refine Success Count': '',
+            'Accuracy': '<timeout>',
+            'NN Accuracies': '<timeout>',
+            'Refine Accuracies': '<timeout>',
+            'NN Success Count': '<timeout>',
+            'Refine Success Count': '<timeout>',
         }
 
 def train(version: VIENNA_VERSIONS, features: int, renderer: str, trial: int):
