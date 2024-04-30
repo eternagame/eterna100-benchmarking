@@ -29,13 +29,13 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
                 if ensemble_subset == '1trial-allfeat' and not re.match(r'trial-0_MI-\d+', model):
                     continue
                 
-                if ensemble_subset == '20trials-nofeat' and not re.match(r'trial-\d_MI-0', model):
+                if ensemble_subset == '20trials-nofeat' and not re.match(r'trial-\d+_MI-0', model):
                     continue
                 
-                if ensemble_subset == '20trials-20feat' and not re.match(r'trial-\d_MI-20', model):
+                if ensemble_subset == '20trials-20feat' and not re.match(r'trial-\d+_MI-20', model):
                     continue
                 
-                if ensemble_subset == '20trials-42feat' and not re.match(r'trial-\d_MI-42', model):
+                if ensemble_subset == '20trials-42feat' and not re.match(r'trial-\d+_MI-42', model):
                     continue
 
                 start = time.perf_counter()
