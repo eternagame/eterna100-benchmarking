@@ -89,7 +89,7 @@ def run(args):
                     timeout = 60 * 40
 
             packer.add(Task(
-                f'python scripts/queue_benchmarks.py --solver {solver} --folder {folder} --structure {structure} --structure-id {structure_id} --trial-start {trial} --trial-end {trial} --timeout {args.timeout}',
+                f'python scripts/queue_benchmarks.py --solver {solver} --folder {folder} --structure "{structure}" --structure-id {structure_id} --trial-start {trial} --trial-end {trial} --timeout {args.timeout}',
                 memory,
                 timeout
             ))
