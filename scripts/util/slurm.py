@@ -7,7 +7,7 @@ root_path = os.path.join(os.path.dirname(__file__), '../../')
 
 def sbatch(
     commands: Union[str, list[str]],
-    job_name,
+    job_name: str,
     timeout: str = None,
     partition: str = None,
     cpus: int = None,
@@ -18,12 +18,17 @@ def sbatch(
     dependency: str = None,
     mail_type: str = None,
     constraint: str = None,
+    array: str = None,
+    echo_cmd: bool = False,
 ):
     args = ['sbatch']
 
     if job_name is not None:
         args.append(f'--job-name={job_name}')
-        args.append(f'--output=data/slurm/%j-{job_name}.txt')
+        job_id = '%j'
+        if array is not None:
+            job_id = '%A_%a'
+        args.append(f'--output=data/slurm/{job_id}-{job_name}.txt')
     
     if timeout is not None:
         args.append(f'--time={timeout}')
@@ -55,7 +60,16 @@ def sbatch(
     if constraint is not None:
         args.append(f'--constraint={constraint}')
 
-    input = ('#!/bin/sh\n\nset -e\n\n' + (commands if isinstance(commands, str) else '\n'.join(commands)))
+    if array is not None:
+        args.append(f'--array={array}')
+
+    shebang = '#!/bin/sh'
+    set = 'set -e'
+    if echo_cmd:
+        set += 'x'
+    body = (commands if isinstance(commands, str) else '\n'.join(commands))
+
+    input = f'{shebang}\n\n{set}\n\n{body}'
 
     if os.environ.get('SLURM_DRY_RUN') == 'true':
         print(f'SBATCH STDIN:\n{input}\n-------')
