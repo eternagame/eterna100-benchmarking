@@ -45,7 +45,7 @@ def run(args):
             memory = '8000MB'
             timeout = 60*60*24
             if solver == 'rnainverse':
-                memory = '50MB'
+                memory = '100MB'
                 if len(structure) < 120:
                     timeout = 60
                 elif len(structure) < 240:
