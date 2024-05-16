@@ -53,7 +53,7 @@ def run(args):
                 else:
                     timeout = 60 * 60
             if solver.startswith('nemo-'):
-                memory = '50MB'
+                memory = '100MB'
                 mult = 4 if solver == 'nemo-10k' else 1
                 if len(structure) < 40:
                     timeout = 60 * 10 * mult
