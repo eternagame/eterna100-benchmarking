@@ -86,7 +86,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
                 ]
                 trimmed_res = re.sub('|'.join([fr'({line})' for line in ignore_lines]), '', res)
                 if len(res) > 2500:
-                    trimmed_res = f'{trimmed_res[:1250]}...{trimmed_res[:-1250]}'
+                    trimmed_res = f'{trimmed_res[:1250]}...{trimmed_res[-1250:]}'
                 clean_res = trimmed_res.replace('\n', '\\n')
                 with open(f'{tempdir}/refined/refine.pkl', 'rb') as f:
                     refine_output = pickle.load(f)

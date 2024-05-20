@@ -36,7 +36,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, model_path: str, timeout: in
         
         trimmed_res = re.sub(r'.+(Your CPU supports instructions|FutureWarning: Passing \(type, 1\)[^\n]+\n\s+ (_np_q|np_resource)|RuntimeWarning: compiletime version.+of module.+fast_tensor_util[^\n]+\n\s+return f)[^\n]+\n', '', res)
         if len(trimmed_res) > 2500:
-            trimmed_res = f'{trimmed_res[:1250]}...{trimmed_res[:-1250]}'
+            trimmed_res = f'{trimmed_res[:1250]}...{trimmed_res[-1250:]}'
         clean_res = trimmed_res.replace('\n', '\\n')
 
         print(f'Meta-Learna-Adapt(v={version}, s={structure}, m={model_path}): {clean_res}')
