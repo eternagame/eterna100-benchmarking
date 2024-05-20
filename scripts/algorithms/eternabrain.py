@@ -33,8 +33,7 @@ def solve(structure: str, cnn_version: VIENNA_VERSIONS, sap_version: VIENNA_VERS
             r'.+dso_loader\.cc:44\] Successfully opened dynamic library.+\n',
         ]
         trimmed_res = re.sub('|'.join([fr'({line})' for line in ignore_lines]), '', res)
-        clean_res = trimmed_res
-        #clean_res = trimmed_res.replace('\n', '\\n')
+        clean_res = clean_res = trimmed_res.replace('\n', '\\n')
 
         print(f'eternabrain-sap(cv={cnn_version}, sv={sap_version}, m={model_name}, s={structure}): {clean_res}')
 
