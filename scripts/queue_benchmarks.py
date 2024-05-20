@@ -75,7 +75,7 @@ def run(args):
                 else:
                     timeout = 60 * 30 * mult
             if solver.startswith('learna-'):
-                memory = '1000MB'
+                memory = '1250MB'
                 timeout = 60 * 60 * 24
             if solver.startswith('eternabrain-'):
                 memory = '4000MB'
