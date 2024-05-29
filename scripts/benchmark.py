@@ -117,7 +117,7 @@ def run(solver, folder, structure, timeout):
         'Folded Structure': folded,
         'Time': str(end - start),
         'Success': '1' if structure == folded else '0',
-        **solution
+        'Extra': solution
     }
 
 if __name__ == '__main__':

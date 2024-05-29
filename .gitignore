@@ -6,6 +6,7 @@
 __pycache__/
 /data/partials/
 /data/slurm/
+data/*.lock
 rna.ps
 /venv
 /.venv

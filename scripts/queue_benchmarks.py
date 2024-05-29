@@ -1,8 +1,10 @@
 import argparse
 import os
+import json
 from math import ceil
 from itertools import product
 import pandas as pd
+from filelock import FileLock
 from benchmark import solvers, run as run_benchmark
 from util.job_packer import JobPacker, Task
 from util.slurm import sbatch
@@ -18,10 +20,10 @@ def run(args):
     v1_unsolveable_structures = puzzles[puzzles['Puzzle Name'] == 'Hoglafractal']['Secondary Structure V2'].to_list()
 
     packer = JobPacker()
-    for (solver, folder, (structure_id, structure), trial) in product(
+    for (solver, folder, structure, trial) in product(
         [args.solver] if args.solver is not None else solvers,
         [args.folder] if args.folder is not None else ['vienna1', 'vienna2'],
-        [[args.structure_id, args.structure]] if args.structure is not None else enumerate(structures, 1),
+        [args.structure] if args.structure is not None else structures,
         range(args.trial_start, args.trial_end + 1)
     ):
         if folder == 'vienna2' and structure in v2_unsolveable_structures:
@@ -89,15 +91,36 @@ def run(args):
                     timeout = 60 * 40
 
             packer.add(Task(
-                f'python scripts/queue_benchmarks.py --solver {solver} --folder {folder} --structure "{structure}" --structure-id {structure_id} --trial-start {trial} --trial-end {trial} --timeout {args.timeout}',
+                f'python scripts/queue_benchmarks.py --solver {solver} --folder {folder} --structure "{structure}" --trial-start {trial} --trial-end {trial} --timeout {args.timeout}',
                 memory,
                 timeout
             ))
         else:
             res = run_benchmark(solver, folder, structure, args.timeout)
-            with open(f'{DATA_DIR}/partials/{solver}_{folder}_s{structure_id}_t{trial}.tsv', 'w') as f:
-                f.write('\t'.join(res.keys()) + '\tTrial\n')
-                f.write('\t'.join(res.values()) + f'\t{trial}\n')
+            res['Trial'] = trial
+            res['Extra'] = json.dumps(res['Extra'])
+            with FileLock(f'{DATA_DIR}/results.tsv.lock'):
+                if os.path.exists(f'{DATA_DIR}/results.tsv'):
+                    all_results = pd.read_csv(f'{DATA_DIR}/results.tsv', sep='\t')
+                    all_results = all_results[~(
+                        (all_results['Algorithm'] == res['Algorithm'])
+                        & (all_results['Variant'] == res['Variant'])
+                        & (all_results['Folder'] == res['Folder'])
+                        & (all_results['Target Structure'] == res['Target Structure'])
+                        & (all_results['Trial'] == res['Trial'])
+                    )]
+                else:
+                    # We specify these columns here to ensure they're in the order we want
+                    all_results = pd.DataFrame(columns=[
+                        'Algorithm',
+                        'Variant',
+                        'Folder',
+                        'Target Structure',
+                        'Trial'
+                    ])
+                all_results = pd.concat([all_results, pd.DataFrame([res])])
+                all_results = all_results.sort_values(by=['Algorithm', 'Variant', 'Folder', 'Target Structure', 'Trial'])
+                all_results.to_csv(f'{DATA_DIR}/results.tsv', sep='\t', index=False)
     
     if args.scheduler == 'slurm':
         batches = packer.pack(args.timeout)
@@ -110,8 +133,6 @@ def run(args):
             job_name += f'_s-{args.solver}'
         if args.folder is not None:
             job_name += f'_f-{args.folder}'
-        if args.structure_id is not None:
-            job_name += f'_sid-{args.structure_id}'
         job_name += f'_t-{args.trial_start}-{args.trial_end}'
 
         for batch in batches:
@@ -137,14 +158,11 @@ if __name__ == '__main__':
 
     parser.add_argument('--solver', dest='solver', choices=solvers, default=None)
     parser.add_argument('--folder', dest='folder', choices=['vienna1', 'vienna2'], default=None)
-    structure_action = parser.add_argument('--structure', dest='structure', type=str, default=None)
-    parser.add_argument('--structure-id', dest='structure_id', help='if --structure is provided, what unique ID for this structure should be used in the output filename?', type=str, default=None)
+    parser.add_argument('--structure', dest='structure', type=str, default=None)
     parser.add_argument('--trial-start', dest='trial_start', type=int, default=1)
     parser.add_argument('--trial-end', dest='trial_end', type=int, default=5)
 
     parser.add_argument('--minimal-solvers', dest='minimal_solvers', action='store_true')
 
     args = parser.parse_args()
-    if args.structure and args.structure_id is None:
-        raise argparse.ArgumentError(structure_action, '--structure_id must be provided if --structure is provided')
     run(args)
