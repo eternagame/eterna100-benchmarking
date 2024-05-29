@@ -146,7 +146,7 @@ def run(args):
                 mail_type='END',
                 array=batch.slurm_array_indexes(),
                 echo_cmd=True,
-                constraint='CPU_MNF:INTEL&CPU_SKU:7502'
+                constraint='CPU_MNF:AMD&CPU_SKU:7502'
             )
 
 if __name__ == '__main__':
