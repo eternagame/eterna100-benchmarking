@@ -124,7 +124,8 @@ def run(args):
                 memory_per_cpu=batch.memory,
                 mail_type='END',
                 array=batch.slurm_array_indexes(),
-                echo_cmd=True
+                echo_cmd=True,
+                constraint='CPU_MNF:INTEL&CPU_SKU:7502'
             )
 
 if __name__ == '__main__':
