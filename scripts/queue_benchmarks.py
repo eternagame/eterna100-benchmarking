@@ -31,15 +31,15 @@ def run(args):
         if folder == 'vienna1' and structure in v1_unsolveable_structures:
             continue
         if args.minimal_solvers and solver not in [
-            #'nemo-2500',
-            #'learna-pretrained',
-            #'learna-retrained-vienna1',
+            'nemo-2500',
+            'learna-pretrained',
+            'learna-retrained-vienna1',
             'sentrna-pretrained-20t20f',
             'sentrna-retrained-vienna2-rnaplot-20t20f',
-            #'eternabrain-pretrained',
-            #'eternabrain-retrained-f1-ext',
-            #'eternabrain-retrained-f2-ext',
-            #'eternabrain-retrained-f2-ext-flipsap'
+            'eternabrain-pretrained',
+            'eternabrain-retrained-f1-ext',
+            'eternabrain-retrained-f2-ext',
+            'eternabrain-retrained-f2-ext-flipsap'
         ]:
             continue
 
