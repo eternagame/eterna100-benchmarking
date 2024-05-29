@@ -104,8 +104,8 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
         return {
             'Sequence': sorted_results[0]['refine_seq'],
             'Accuracy': str(sorted_results[0]['refine_accuracy']),
-            'NN Accuracies': '|'.join([str(result['nn_accuracy']) for result in results]),
-            'Refine Accuracies': '|'.join([str(result['refine_accuracy']) for result in results]),
+            'NN Accuracies': [str(result['nn_accuracy']) for result in results],
+            'Refine Accuracies': [str(result['refine_accuracy']) for result in results],
             'NN Success Count': str(sum([1 if result['nn_accuracy'] == 1.0 else 0 for result in results])),
             'Refine Success Count': str(sum([1 if result['refine_accuracy'] == 1.0 else 0 for result in results])),
         }
