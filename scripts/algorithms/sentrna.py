@@ -103,11 +103,11 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
         sorted_results = sorted(results, key=lambda result: float(result['refine_accuracy']))
         return {
             'Sequence': sorted_results[0]['refine_seq'],
-            'Accuracy': str(sorted_results[0]['refine_accuracy']),
-            'NN Accuracies': [str(result['nn_accuracy']) for result in results],
-            'Refine Accuracies': [str(result['refine_accuracy']) for result in results],
-            'NN Success Count': str(sum([1 if result['nn_accuracy'] == 1.0 else 0 for result in results])),
-            'Refine Success Count': str(sum([1 if result['refine_accuracy'] == 1.0 else 0 for result in results])),
+            'Accuracy': sorted_results[0]['refine_accuracy'],
+            'NN Accuracies': [result['nn_accuracy'] for result in results],
+            'Refine Accuracies': [result['refine_accuracy'] for result in results],
+            'NN Success Count': sum([1 if result['nn_accuracy'] == 1.0 else 0 for result in results]),
+            'Refine Success Count': sum([1 if result['refine_accuracy'] == 1.0 else 0 for result in results]),
         }
     except TimeoutExpired:
         print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, r={renderer}): <timeout>')

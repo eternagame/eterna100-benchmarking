@@ -115,7 +115,7 @@ def run(solver, folder, structure, timeout):
         'Target Structure': structure,
         'Sequence': sequence,
         'Folded Structure': folded,
-        'Time': str(end - start),
+        'Time': end - start,
         'Success': '1' if structure == folded else '0',
         'Extra': solution
     }
