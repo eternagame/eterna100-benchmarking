@@ -19,6 +19,20 @@ def run(args):
     v2_unsolveable_structures = puzzles[puzzles['Secondary Structure V1'] != puzzles['Secondary Structure V2']]['Secondary Structure V1'].to_list()
     v1_unsolveable_structures = puzzles[puzzles['Puzzle Name'] == 'Hoglafractal']['Secondary Structure V2'].to_list()
 
+
+    all_results_queuetime = pd.DataFrame(columns=[
+        'Algorithm',
+        'Variant',
+        'Folder',
+        'Target Structure',
+        'Trial'
+    ])
+    if args.new_only:
+        with FileLock(f'{DATA_DIR}/results.tsv.lock'):
+            if os.path.exists(f'{DATA_DIR}/results.tsv'):
+                all_results_queuetime = pd.read_csv(f'{DATA_DIR}/results.tsv', sep='\t')
+            
+
     packer = JobPacker()
     for (solver, folder, structure, trial) in product(
         [args.solver] if args.solver is not None else solvers,
@@ -26,6 +40,7 @@ def run(args):
         [args.structure] if args.structure is not None else structures,
         range(args.trial_start, args.trial_end + 1)
     ):
+        (algorithm, variant, *_) = solver.split('-', 1) + ['default']
         if folder == 'vienna2' and structure in v2_unsolveable_structures:
             continue
         if folder == 'vienna1' and structure in v1_unsolveable_structures:
@@ -41,6 +56,17 @@ def run(args):
             'eternabrain-retrained-f2-ext',
             'eternabrain-retrained-f2-ext-flipsap'
         ]:
+            continue
+        if (
+            args.new_only
+            and len(all_results_queuetime[(
+                (all_results['Algorithm'] == algorithm)
+                & (all_results['Variant'] == variant)
+                & (all_results['Folder'] == folder)
+                & (all_results['Target Structure'] == structure)
+                & (all_results['Trial'] == trial)
+            )]) > 1
+        ):
             continue
 
         if args.scheduler == 'slurm':
@@ -163,6 +189,7 @@ if __name__ == '__main__':
     parser.add_argument('--trial-end', dest='trial_end', type=int, default=5)
 
     parser.add_argument('--minimal-solvers', dest='minimal_solvers', action='store_true')
+    parser.add_argument('--new-only', dest='new_only', action='store_true')
 
     args = parser.parse_args()
     run(args)
