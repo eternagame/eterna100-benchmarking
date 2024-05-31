@@ -60,11 +60,11 @@ def run(args):
         if (
             args.new_only
             and len(all_results_queuetime[(
-                (all_results['Algorithm'] == algorithm)
-                & (all_results['Variant'] == variant)
-                & (all_results['Folder'] == folder)
-                & (all_results['Target Structure'] == structure)
-                & (all_results['Trial'] == trial)
+                (all_results_queuetime['Algorithm'] == algorithm)
+                & (all_results_queuetime['Variant'] == variant)
+                & (all_results_queuetime['Folder'] == folder)
+                & (all_results_queuetime['Target Structure'] == structure)
+                & (all_results_queuetime['Trial'] == trial)
             )]) > 1
         ):
             continue
