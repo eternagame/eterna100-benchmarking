@@ -69,11 +69,11 @@ def run(args):
                 memory = '500MB'
                 mult = 43 if solver.endswith('1taf') else 20
                 if len(structure) < 40:
-                    timeout = 60 * 4 * mult
+                    timeout = 60 * 5 * mult
                 elif len(structure) < 120:
-                    timeout = 60 * 8 * mult
+                    timeout = 60 * 10 * mult
                 elif len(structure) < 240:
-                    timeout = 60 * 20 * mult
+                    timeout = 60 * 25 * mult
                 else:
                     timeout = 60 * 45 * mult
             if solver.startswith('learna-'):
