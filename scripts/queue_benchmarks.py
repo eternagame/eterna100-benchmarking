@@ -65,7 +65,7 @@ def run(args):
                 & (all_results_queuetime['Folder'] == folder)
                 & (all_results_queuetime['Target Structure'] == structure)
                 & (all_results_queuetime['Trial'] == trial)
-            )]) > 1
+            )]) > 0
         ):
             continue
 
