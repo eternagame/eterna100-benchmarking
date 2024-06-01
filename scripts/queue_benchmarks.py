@@ -50,6 +50,7 @@ def run(args):
             'nemo-2500',
             'learna-pretrained',
             'learna-retrained-vienna1',
+            'learna-retrained-vienna2',
             'sentrna-pretrained-20t20f',
             'sentrna-retrained-vienna2-rnaplot-20t20f',
             'eternabrain-pretrained',
