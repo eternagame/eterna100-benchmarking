@@ -52,6 +52,7 @@ def run(args):
             'learna-retrained-vienna1',
             'learna-retrained-vienna2',
             'sentrna-pretrained-20t20f',
+            'sentrna-retrained-vienna1-rnaplot-20t20f',
             'sentrna-retrained-vienna2-rnaplot-20t20f',
             'eternabrain-pretrained',
             'eternabrain-retrained-f1-ext',
