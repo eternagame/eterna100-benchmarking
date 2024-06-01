@@ -61,7 +61,7 @@ def train(timeout: int, vienna_version: VIENNA_VERSIONS):
         '--data_dir', 'data/',
         '--dataset', 'rfam_learn_train',
         '--vienna_version', vienna_version,
-        '--save_path', 'models/eterna100-benchmarking/vienna-1.8.5',
+        '--save_path', f'models/eterna100-benchmarking/{vienna_version}',
         '--timeout', str(timeout),
         '--learning_rate', '6.442010833400271e-05',
         '--mutation_threshold', '5',
