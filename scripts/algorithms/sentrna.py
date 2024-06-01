@@ -100,7 +100,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
                     'refine_accuracy': refine_accuracy,
                 })
             
-        sorted_results = sorted(results, key=lambda result: float(result['refine_accuracy']))
+        sorted_results = sorted(results, key=lambda result: float(result['refine_accuracy']), reverse=True)
         return {
             'Sequence': sorted_results[0]['refine_seq'],
             'Accuracy': sorted_results[0]['refine_accuracy'],
