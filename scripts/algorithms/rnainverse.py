@@ -12,7 +12,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, timeout: int):
         clean_res = res.replace('\n', '\\n')
         print(f'RNAinverse(v={version}, s={structure}): {clean_res}')
 
-        formatted = re.split('\s+| \(?\s?', res)
+        formatted = re.split(r'\s+| \(?\s?', res)
         return {'Sequence': formatted[0]}
     except TimeoutExpired:
         print(f'RNAinverse(v={version}, s={structure}): <timeout>')
