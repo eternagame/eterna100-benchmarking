@@ -30,7 +30,7 @@ if [ ! -d ViennaRNA-2.1.9 ]; then
 fi
 pushd ViennaRNA-2.1.9
 
-./configure --prefix=$setup_root/ViennaRNA-2.1.9/build --without-perl --without-forester --without-kinfold
+./configure CFLAGS="-Wno-error=implicit-int -Wno-error=implicit-function-declaration" --prefix=$setup_root/ViennaRNA-2.1.9/build --without-perl --without-forester --without-kinfold
 make check
 make install
 
