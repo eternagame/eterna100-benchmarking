@@ -12,8 +12,6 @@ from util.slurm import sbatch
 DATA_DIR = os.path.join(os.path.dirname(__file__), '../data')
 
 def run(args):
-    os.makedirs(f'{DATA_DIR}/partials', exist_ok=True)
-    
     puzzles = pd.read_csv(f'{DATA_DIR}/eterna100_puzzles.tsv', sep='\t')
     structures = pd.concat([puzzles['Secondary Structure V1'], puzzles['Secondary Structure V2']]).unique()
     v2_unsolveable_structures = puzzles[puzzles['Secondary Structure V1'] != puzzles['Secondary Structure V2']]['Secondary Structure V1'].to_list()
