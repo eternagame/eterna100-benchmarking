@@ -676,10 +676,10 @@ index 8679b09..7e14727 100644
      current_pm = get_pairmap_from_secstruct(current_struc)
 diff --git a/rna-prediction/vienna.py b/rna-prediction/vienna.py
 new file mode 100644
-index 0000000..134bbfb
+index 0000000..e95f9b1
 --- /dev/null
 +++ b/rna-prediction/vienna.py
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,20 @@
 +import os, re
 +from subprocess import Popen, PIPE, STDOUT
 +
@@ -690,11 +690,13 @@ index 0000000..134bbfb
 +        bin_path = os.environ['VIENNA_BIN_PATH']
 +    p = Popen([bin_path + '/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
 +    out = p.communicate(input=''.join(seq))[0]
-+    match = re.search('^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
++    match = re.search(r'^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
++    if not match:
++        raise RuntimeError('Could not parse output of RNAfold:', out)
 +    return match.group(2), match.group(3)
 +
 +def energy_of_structure(seq, struct, verbosity):
 +    p = Popen([os.environ['VIENNA_BIN_PATH'] + '/RNAeval', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
 +    out = p.communicate(input=''.join(seq) + '\n' + ''.join(struct))[0]
 +    
-+    return float(re.search('^(WARNING: bases \d+ and \d+ \(\w+\) can\'t pair!\n)*(.+)\\n(.+)\s+\(\s*(.+)\)$', out).group(4))
++    return float(re.search(r'^(WARNING: bases \d+ and \d+ \(\w+\) can\'t pair!\n)*(.+)\\n(.+)\s+\(\s*(.+)\)$', out).group(4))
