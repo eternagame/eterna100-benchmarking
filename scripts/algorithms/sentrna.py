@@ -62,8 +62,13 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
                 ]
                 trimmed_res = re.sub('|'.join([fr'({line})' for line in ignore_lines]), '', res)
                 clean_res = trimmed_res.replace('\n', '\\n')
-                with open(f'{tempdir}/test_results/nn.pkl', 'rb') as f:
-                    nn_output = pickle.load(f)
+                try:
+                    with open(f'{tempdir}/test_results/nn.pkl', 'rb') as f:
+                        nn_output = pickle.load(f)
+                except:
+                    print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=NN): {clean_res}')
+                    raise RuntimeError('Could not open nn.pkl')
+                
                 print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=NN): {clean_res} | {str(nn_output)}')
 
                 (nn_name, nn_struct, nn_seq, nn_accuracy) = nn_output[0]

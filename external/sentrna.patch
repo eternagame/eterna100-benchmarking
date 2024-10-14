@@ -12,7 +12,7 @@ index a86acb7..f9e3523 100644
  
  
 diff --git a/SentRNA/util/compute_mfe.py b/SentRNA/util/compute_mfe.py
-index 298f227..aba362b 100644
+index 298f227..0ea0107 100644
 --- a/SentRNA/util/compute_mfe.py
 +++ b/SentRNA/util/compute_mfe.py
 @@ -5,10 +5,12 @@ import re
@@ -23,7 +23,7 @@ index 298f227..aba362b 100644
 -    output = p.communicate(input=pred_solution)[0]
 -    pred_struct = re.split('\s+| \(?\s?', output)[1]
 -    return pred_struct
-+    p = Popen(['RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
++    p = Popen(['RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
 +    out = p.communicate(input=pred_solution)[0]
 +    match = re.search(r'^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
 +    if not match:
