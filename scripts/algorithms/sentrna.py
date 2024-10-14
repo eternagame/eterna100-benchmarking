@@ -65,9 +65,9 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
                 try:
                     with open(f'{tempdir}/test_results/nn.pkl', 'rb') as f:
                         nn_output = pickle.load(f)
-                except:
+                except Exception as e:
                     print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=NN): {clean_res}')
-                    raise RuntimeError('Could not open nn.pkl')
+                    raise e
                 
                 print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=NN): {clean_res} | {str(nn_output)}')
 
