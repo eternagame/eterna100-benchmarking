@@ -43,7 +43,7 @@ def run(args):
             continue
         if folder == 'vienna1' and structure in v1_unsolveable_structures:
             continue
-        if args.minimal_solvers and solver not in [
+        minimal_solvers = [
             'rnainverse',
             'nemo-2500',
             'learna-pretrained',
@@ -56,7 +56,13 @@ def run(args):
             'eternabrain-retrained-f1-ext',
             'eternabrain-retrained-f2-ext',
             'eternabrain-retrained-f2-ext-flipsap'
-        ]:
+        ]
+        solver_enabled = (
+            (args.minimal_solvers and solver in minimal_solvers)
+            or (args.extended_solvers and solver not in minimal_solvers)
+            or (not args.minimal_solvers and not args.extended_solvers)
+        )
+        if not solver_enabled:
             continue
         if (
             args.new_only
@@ -190,6 +196,7 @@ if __name__ == '__main__':
     parser.add_argument('--trial-end', dest='trial_end', type=int, default=5)
 
     parser.add_argument('--minimal-solvers', dest='minimal_solvers', action='store_true')
+    parser.add_argument('--extended-solvers', dest='extended_solvers', action='store_true')
     parser.add_argument('--new-only', dest='new_only', action='store_true')
 
     args = parser.parse_args()
