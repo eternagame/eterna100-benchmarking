@@ -93,9 +93,12 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
                 if len(res) > 2500:
                     trimmed_res = f'{trimmed_res[:1250]}...{trimmed_res[-1250:]}'
                 clean_res = trimmed_res.replace('\n', '\\n')
-                with open(f'{tempdir}/refined/refine.pkl', 'rb') as f:
-                    refine_output = pickle.load(f)
-                print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=REFINE): {clean_res} | {str(refine_output)}')
+                try:
+                    with open(f'{tempdir}/refined/refine.pkl', 'rb') as f:
+                        refine_output = pickle.load(f)
+                except Exception as e:
+                    print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=REFINE): {clean_res}')
+                    raise e
 
                 (refine_name, refine_struct, refine_seq, refine_accuracy) = refine_output[0]
                 results.append({
