@@ -676,7 +676,7 @@ index 8679b09..7e14727 100644
      current_pm = get_pairmap_from_secstruct(current_struc)
 diff --git a/rna-prediction/vienna.py b/rna-prediction/vienna.py
 new file mode 100644
-index 0000000..e95f9b1
+index 0000000..52ee3e6
 --- /dev/null
 +++ b/rna-prediction/vienna.py
 @@ -0,0 +1,20 @@
@@ -692,7 +692,7 @@ index 0000000..e95f9b1
 +    out = p.communicate(input=''.join(seq))[0]
 +    match = re.search(r'^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
 +    if not match:
-+        raise RuntimeError('Could not parse output of RNAfold:', out)
++        raise RuntimeError('Could not parse output of RNAfold for seq', ''.join(seq), ':', out)
 +    return match.group(2), match.group(3)
 +
 +def energy_of_structure(seq, struct, verbosity):
