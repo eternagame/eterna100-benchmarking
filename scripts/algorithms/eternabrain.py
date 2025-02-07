@@ -22,7 +22,7 @@ def solve(structure: str, cnn_version: VIENNA_VERSIONS, sap_version: VIENNA_VERS
         ignore_lines = [
             r'.+The name tf\.train\.import_meta_graph is deprecated.+\n\n',
             r'.+The name tf.Session is deprecated.+\n\n',
-            r'.+Could not load dynamic library ((\'\w+\.so\.10\.0\')|(\'libcudnn\.so\.7\')).+\n',
+            r'.+Could not load dynamic library ((\'\w+\.so\.10\.0\')|(\'libcudnn\.so\.7\')|(\'libcuda\.so\.1\')).+\n',
             r'.+/gpu_device\.cc:1165\]\s*\n',
             r'.+Device interconnect StreamExecutor with strength 1 edge matrix.+\n',
             r'.+service\.cc:168\] XLA service 0x[a-f0-9]+ initialized.+\n',
@@ -31,6 +31,9 @@ def solve(structure: str, cnn_version: VIENNA_VERSIONS, sap_version: VIENNA_VERS
             r'.+cpu_utils\.cc:94\] CPU Frequency.+\n',
             r'.+Your CPU supports instructions that this TensorFlow binary was not compiled to use.+\n',
             r'.+dso_loader\.cc:44\] Successfully opened dynamic library.+\n',
+            r'.+SyntaxWarning: assertion is always true, perhaps remove parentheses?\n  assert.+\n',
+            r'.+cuda_driver.cc:318] failed call to cuInit: UNKNOWN ERROR.+\n',
+            r'.+cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host.+\n'
         ]
         trimmed_res = re.sub('|'.join([fr'({line})' for line in ignore_lines]), '', res)
         clean_res = clean_res = trimmed_res.replace('\n', '\\n')
