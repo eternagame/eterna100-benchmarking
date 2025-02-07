@@ -1,5 +1,5 @@
 diff --git a/SentRNA/run.py b/SentRNA/run.py
-index a86acb7..f9e3523 100644
+index a86acb7..a90a3ca 100644
 --- a/SentRNA/run.py
 +++ b/SentRNA/run.py
 @@ -59,7 +59,7 @@ def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_feature
@@ -11,6 +11,12 @@ index a86acb7..f9e3523 100644
      return 0
  
  
+@@ -229,5 +229,3 @@ if __name__ == '__main__':
+         os.system('mkdir refined')
+         move_set = eval(args.move_set)
+         refine(input_data, args.results_path, args.n_trajs, args.n_steps, move_set, args.refine_puzzle_name)
+-    # Removing unnecessary files generated during run
+-    os.system('rm input rna.ps') 
 diff --git a/SentRNA/util/compute_mfe.py b/SentRNA/util/compute_mfe.py
 index 298f227..c101dce 100644
 --- a/SentRNA/util/compute_mfe.py
