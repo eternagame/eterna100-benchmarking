@@ -20,10 +20,10 @@ index 89d0441..7ba7203 100644
      dot_brackets = parse_dot_brackets(
          dataset=args.dataset,
 diff --git a/src/learna/environment.py b/src/learna/environment.py
-index c15264a..77a4218 100644
+index c15264a..f5e24a7 100644
 --- a/src/learna/environment.py
 +++ b/src/learna/environment.py
-@@ -7,8 +7,17 @@ from distance import hamming
+@@ -7,8 +7,20 @@ from distance import hamming
  import numpy as np
  from tensorforce.environments import Environment
  
@@ -34,8 +34,11 @@ index c15264a..77a4218 100644
 +from subprocess import Popen, PIPE, STDOUT
 +external_path = os.path.join(os.path.dirname(__file__), '../../..')
 +def fold(seq, version):
-+    p = Popen([f'{external_path}/ViennaRNA-{version}/build/bin/RNAfold', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
-+    out = p.communicate(input=seq)[0]
++    args = [external_path + '/ViennaRNA-' + version + '/build/bin/RNAfold', '-T','37.0']
++    if version.startswith('2.'):
++        args.append('--noPS')
++    p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
++    out = p.communicate(input=''.join(seq))[0]
 +    match = re.search(r'^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
 +    if not match:
 +        raise RuntimeError('Could not parse output of RNAfold for seq', seq, ':', out)
@@ -43,7 +46,7 @@ index c15264a..77a4218 100644
  
  @dataclass
  class RnaDesignEnvironmentConfig:
-@@ -30,6 +39,7 @@ class RnaDesignEnvironmentConfig:
+@@ -30,6 +42,7 @@ class RnaDesignEnvironmentConfig:
      state_radius: int = 5
      use_conv: bool = True
      use_embedding: bool = False
@@ -51,7 +54,7 @@ index c15264a..77a4218 100644
  
  
  def _string_difference_indices(s1, s2):
-@@ -289,15 +299,18 @@ class RnaDesignEnvironment(Environment):
+@@ -289,15 +302,18 @@ class RnaDesignEnvironment(Environment):
          differing_sites = _string_difference_indices(
              self.target.dot_bracket, folded_design
          )
@@ -74,7 +77,7 @@ index c15264a..77a4218 100644
  
      def _get_reward(self, terminal):
          """
-@@ -312,7 +325,7 @@ class RnaDesignEnvironment(Environment):
+@@ -312,7 +328,7 @@ class RnaDesignEnvironment(Environment):
          if not terminal:
              return 0
  
