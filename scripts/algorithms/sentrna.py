@@ -100,6 +100,8 @@ def solve(structure: str, version: VIENNA_VERSIONS, ensemble_path: str, ensemble
                     print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=REFINE): {clean_res}')
                     raise e
 
+                print(f'SentRNA(v={version}, s={structure}, e={ensemble_path}, es={ensemble_subset}, m={model}, r={renderer}, stage=REFINE): {clean_res} | {str(refine_output)}')
+
                 (refine_name, refine_struct, refine_seq, refine_accuracy) = refine_output[0]
                 results.append({
                     'nn_seq': nn_seq,
