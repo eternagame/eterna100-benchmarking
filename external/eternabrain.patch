@@ -676,7 +676,7 @@ index 8679b09..7e14727 100644
      current_pm = get_pairmap_from_secstruct(current_struc)
 diff --git a/rna-prediction/vienna.py b/rna-prediction/vienna.py
 new file mode 100644
-index 0000000..52ee3e6
+index 0000000..1e226c4
 --- /dev/null
 +++ b/rna-prediction/vienna.py
 @@ -0,0 +1,20 @@
@@ -699,4 +699,4 @@ index 0000000..52ee3e6
 +    p = Popen([os.environ['VIENNA_BIN_PATH'] + '/RNAeval', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
 +    out = p.communicate(input=''.join(seq) + '\n' + ''.join(struct))[0]
 +    
-+    return float(re.search(r'^(WARNING: bases \d+ and \d+ \(\w+\) can\'t pair!\n)*(.+)\\n(.+)\s+\(\s*(.+)\)$', out).group(4))
++    return float(re.search(r'^(WARNING: bases \d+ and \d+ \(\w+\) can\'t pair!\n)*(.+)\n(.+)\s+\(\s*(.+)\)$', out).group(4))
