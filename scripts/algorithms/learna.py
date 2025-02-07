@@ -42,7 +42,7 @@ def solve(structure: str, version: VIENNA_VERSIONS, model_path: str, timeout: in
 
         print(f'Meta-Learna-Adapt(v={version}, s={structure}, m={model_path}): {print_res}')
 
-        (elapsed_time, last_reward, last_fractional_hamming, candidate_solution) = clean_res.split('\n')[-1].split(' ')
+        (elapsed_time, last_reward, last_fractional_hamming, candidate_solution) = clean_res.strip().split('\n')[-1].split(' ')
         return {
             'Sequence': candidate_solution,
             'Last Reward': last_reward,
