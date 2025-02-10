@@ -53,7 +53,9 @@ def run(args):
             'sentrna-retrained-vienna1-rnaplot-20t20f',
             'sentrna-retrained-vienna2-rnaplot-20t20f',
             'eternabrain-pretrained',
+            'eternabrain-pretrained-flipsap',
             'eternabrain-retrained-f1-ext',
+            'eternabrain-retrained-f1-ext-flipsap',
             'eternabrain-retrained-f2-ext',
             'eternabrain-retrained-f2-ext-flipsap'
         ]
