@@ -104,7 +104,7 @@ def run(solver, folder, structure, timeout):
     sequence = solution.pop('Sequence')
     (algorithm, variant, *_) = solver.split('-', 1) + ['default']
     if sequence != '<timeout>':
-        folded = fold(sequence, '1.8.5' if folder == 'vienna1' else '2.6.4')
+        folded = fold(sequence, '1.8.5' if folder == 'vienna1' else '2.6.4')[0]
     else:
         folded = '<timeout>'
     
