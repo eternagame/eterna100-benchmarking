@@ -36,7 +36,7 @@ Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1
 
 `scripts/queue_train.py`: Script to run retraining for machine learning models
 
-`scripts/stats.py`: Script to run retraining for machine learning models
+`scripts/stats.py`: Summarize benchmark results
 
 ## Usage
 
