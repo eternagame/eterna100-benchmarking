@@ -97,20 +97,20 @@ def run(args):
                 elif len(structure) < 240:
                     timeout = 60 * 60 * 2 * mult
                 else:
-                    timeout = 60 * 60 * 3 * mult
+                    timeout = 60 * 60 * 10 * mult
             if solver.startswith('sentrna-'):
                 memory = '500MB'
                 mult = 43 if solver.endswith('1taf') else 20
                 if len(structure) < 40:
                     timeout = 60 * 5 * mult
                 elif len(structure) < 120:
-                    timeout = 60 * 10 * mult
+                    timeout = 60 * 15 * mult
                 elif len(structure) < 240:
-                    timeout = 60 * 25 * mult
+                    timeout = 60 * 30 * mult
                 else:
                     timeout = 60 * 45 * mult
             if solver.startswith('learna-'):
-                memory = '1250MB'
+                memory = '1500MB'
                 timeout = 60 * 60 * 24
             if solver.startswith('eternabrain-'):
                 memory = '4000MB'
