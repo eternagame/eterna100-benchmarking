@@ -10,6 +10,8 @@ data/*.lock
 rna.ps
 /venv
 /.venv
+data/*.png
+data/summary-*.tsv
 
 # Editors
 .vscode/
