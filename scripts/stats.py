@@ -52,7 +52,7 @@ def summerize(x):
 
 def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
     v1solves = res[
-        ~(res['Variant'].str.contains('pretrained'))
+        (res['Variant'].str.contains('pretrained') | ~(res['Variant'].str.contains('retrained'))) & ~(res['Variant'].str.contains('flipsap'))
     ][
         res['Target Structure'].isin(puz[f'Secondary Structure V{bench_version}'])
     ].merge(
@@ -81,7 +81,7 @@ def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
         ax.set_xticks(
             range(len(v1solves)),
             [
-                f'{algo}/{variant}'.replace('-f1', '-vienna1').replace('-f2', '-vienna2').replace('-ext', '').replace('/default', '').replace('/2500', '').replace('-rnaplot-20t20f', '')
+                f'{algo}/{variant}'.replace('-f1', '-vienna1').replace('-f2', '-vienna2').replace('-ext', '').replace('/default', '').replace('/2500', '').replace('-rnaplot', '').replace('-20t20f', '')
                 for (algo, variant) in v1solves.index
             ],
             rotation=90
