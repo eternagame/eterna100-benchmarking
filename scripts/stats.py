@@ -102,8 +102,8 @@ def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
 
 fig, axs = plt.subplots(1, 4, figsize=(13, 16))
 plot(1, 1, axs[0], yticks=True, xticks=True)
-plot(1, 2, axs[1], xticks=True)
-plot(2, 1, axs[2], xticks=True)
+plot(2, 1, axs[1], xticks=True)
+plot(1, 2, axs[2], xticks=True)
 plot(2, 2, axs[3], xticks=True)
 fig.legend(
     [
@@ -111,7 +111,7 @@ fig.legend(
         Line2D([0], [0], color=COLOR_SUCCESS, lw=4),
     ],
     ['Failed', 'Success'],
-    loc='upper left', bbox_to_anchor=(1, 1)
+    loc='lower left', bbox_to_anchor=(0.1, 0.05)
 )
 fig.tight_layout()
 fig.savefig(path.join(path.dirname(__file__), f'../data/solvechart.png'), bbox_inches='tight')
