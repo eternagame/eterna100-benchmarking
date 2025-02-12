@@ -51,7 +51,7 @@ def summerize(x):
     return group.iloc[0]
 
 def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
-    v1solves = res[
+    solves = res[
         (res['Variant'].str.contains('pretrained') | ~(res['Variant'].str.contains('retrained'))) & ~(res['Variant'].str.contains('flipsap'))
     ][
         res['Target Structure'].isin(puz[f'Secondary Structure V{bench_version}'])
@@ -66,39 +66,38 @@ def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
         sort=False,
         fill_value=0
     ).astype(int).reset_index()
-    v1solves = v1solves[
-        v1solves['Folder'] == f'vienna{vienna_version}'
+    solves = solves[
+        solves['Folder'] == f'vienna{vienna_version}'
     ].set_index(['Algorithm', 'Variant', 'Folder']).groupby(['Algorithm', 'Variant']).apply(summerize)
-    algosolves = v1solves.groupby('Algorithm').apply(lambda x: x['Total'].mean())
-    v1solves['AlgoSolves'] = v1solves.apply(lambda x: algosolves[x.name[0]], axis=1)
-    v1solves = v1solves.sort_values(['AlgoSolves', 'Variant'], axis=0)
-    del v1solves['Total']
-    del v1solves['AlgoSolves']
+    algosolves = solves.groupby('Algorithm').apply(lambda x: x['Total'].mean())
+    solves['AlgoSolves'] = solves.apply(lambda x: algosolves[x.name[0]], axis=1)
+    solves = solves.sort_values(['AlgoSolves', 'Variant'], axis=0)
+    del solves['Total']
+    del solves['AlgoSolves']
 
-    
     ax.set_title(f'Eterna100-V{bench_version} Vienna{vienna_version}')
     if xticks:
         ax.set_xticks(
-            range(len(v1solves)),
+            range(len(solves)),
             [
                 f'{algo}/{variant}'.replace('-f1', '-vienna1').replace('-f2', '-vienna2').replace('-ext', '').replace('/default', '').replace('/2500', '').replace('-rnaplot', '').replace('-20t20f', '')
-                for (algo, variant) in v1solves.index
+                for (algo, variant) in solves.index
             ],
             rotation=90
         )
     else:
-        ax.set_xticks(range(len(v1solves)), [])
+        ax.set_xticks(range(len(solves)), [])
     if yticks:
         ax.set_yticks(
-            range(len(v1solves.columns)),
-            [name[1] for name in v1solves.columns]
+            range(len(solves.columns)),
+            [name[1] for name in solves.columns]
         )
         for lab in ax.get_yticklabels():
             if lab.get_text() in puz[puz['Secondary Structure V1'] != puz['Secondary Structure V2']]['Puzzle Name'].values:
                 lab.set_fontweight('bold')
     else:
-        ax.set_yticks(range(len(v1solves.columns)), [])
-    ax.imshow(v1solves.transpose().values.tolist(), aspect='auto')
+        ax.set_yticks(range(len(solves.columns)), [])
+    ax.imshow(solves.transpose().values.tolist(), aspect='auto')
 
 fig, axs = plt.subplots(1, 4, figsize=(13, 16))
 plot(1, 1, axs[0], yticks=True, xticks=True)
