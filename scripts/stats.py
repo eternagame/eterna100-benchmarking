@@ -7,6 +7,14 @@ from matplotlib.lines import Line2D
 res = pd.read_csv(path.join(path.dirname(__file__), '../data/results.tsv'), sep='\t')
 puz = pd.read_csv(path.join(path.dirname(__file__), '../data/eterna100_puzzles.tsv'), sep='\t')
 
+eterna_success = pd.concat([
+    puz[['Secondary Structure V1']].rename(columns={'Secondary Structure V1': 'Target Structure'}).assign(Algorithm='Eterna (humans)', Variant='default', Folder='vienna1', Success=1),
+    puz[puz['Secondary Structure V1'] != puz['Secondary Structure V2']][puz['Puzzle Name'] != 'Hoglafractal'][['Secondary Structure V2']].rename(columns={'Secondary Structure V2': 'Target Structure'}).assign(Algorithm='Eterna (humans)', Variant='default', Folder='vienna1', Success=1),
+    puz[['Secondary Structure V2']].rename(columns={'Secondary Structure V2': 'Target Structure'}).assign(Algorithm='Eterna (humans)', Variant='default', Folder='vienna2', Success=1),
+])
+
+res = pd.concat([res, eterna_success])
+
 def summarize(puzzles, name):
     summary = res.groupby(
         ['Algorithm', 'Variant', 'Folder']
@@ -53,13 +61,17 @@ def summerize(x):
 def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
     solves = res[
         (res['Variant'].str.contains('pretrained') | ~(res['Variant'].str.contains('retrained'))) & ~(res['Variant'].str.contains('flipsap'))
-    ][
-        res['Target Structure'].isin(puz[f'Secondary Structure V{bench_version}'])
-    ].merge(
+    ]
+    solves = solves[
+        solves['Target Structure'].isin(puz[f'Secondary Structure V{bench_version}'])
+    ]
+    solves = solves.merge(
         puz[['Puzzle #', f'Secondary Structure V{bench_version}', 'Puzzle Name']],
         left_on='Target Structure',
         right_on=f'Secondary Structure V{bench_version}'
-    ).sort_values('Puzzle #').pivot_table(
+    )
+    solves = solves.sort_values('Puzzle #')
+    solves = solves.pivot_table(
         index=['Algorithm', 'Variant', 'Folder'],
         columns=['Puzzle Name'],
         values=['Success'],
@@ -80,7 +92,7 @@ def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
         ax.set_xticks(
             range(len(solves)),
             [
-                f'{algo}/{variant}'.replace('-f1', '-vienna1').replace('-f2', '-vienna2').replace('-ext', '').replace('/default', '').replace('/2500', '').replace('-rnaplot', '').replace('-20t20f', '')
+                f'{algo}/{variant}'.replace('-f1', '-vienna1').replace('-f2', '-vienna2').replace('-ext', '').replace('/default', '').replace('/2500', '').replace('-rnaplot', '').replace('-20t20f', '').replace('rnainverse', 'RNAinverse').replace('/pretrained', '').replace('eternabrain', 'EternaBrain').replace('learna', 'LEARNA').replace('sentrna', 'SentRNA').replace('nemo', 'NEMO')
                 for (algo, variant) in solves.index
             ],
             rotation=90
