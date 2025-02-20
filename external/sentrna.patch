@@ -1,0 +1,87 @@
+diff --git a/SentRNA/run.py b/SentRNA/run.py
+index a86acb7..a90a3ca 100644
+--- a/SentRNA/run.py
++++ b/SentRNA/run.py
+@@ -59,7 +59,7 @@ def train(results_path, n_layers, hidden_size, nb_epochs, mini_epoch, MI_feature
+         test_accuracy = test_accuracy2
+     pickle.dump([best_model, val_solutions[best_model], val_accuracies[best_model], test_solution, test_accuracy], open('results/%s.pkl'%(results_path), 'w'))
+     os.system('mv test/%s_mini-epoch_%d* test/%s'%(results_path, best_model, results_path))
+-    os.system('rm test/*')
++    os.system('rm test/%s_mini-epoch_*'%(results_path))
+     return 0
+ 
+ 
+@@ -229,5 +229,3 @@ if __name__ == '__main__':
+         os.system('mkdir refined')
+         move_set = eval(args.move_set)
+         refine(input_data, args.results_path, args.n_trajs, args.n_steps, move_set, args.refine_puzzle_name)
+-    # Removing unnecessary files generated during run
+-    os.system('rm input rna.ps') 
+diff --git a/SentRNA/util/compute_mfe.py b/SentRNA/util/compute_mfe.py
+index 298f227..4cbd88e 100644
+--- a/SentRNA/util/compute_mfe.py
++++ b/SentRNA/util/compute_mfe.py
+@@ -5,10 +5,15 @@ import re
+ 
+ def seq_to_struct(pred_solution):
+     '''Returns predicted structure and energy given a sequence.'''
+-    p = Popen(['RNAfold'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+-    output = p.communicate(input=pred_solution)[0]
+-    pred_struct = re.split('\s+| \(?\s?', output)[1]
+-    return pred_struct
++    args = ['RNAfold', '-T','37.0']
++    if 'ViennaRNA-2' in os.environ['PATH']:
++        args.append('--noPS')
++    p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
++    out = p.communicate(input=pred_solution)[0]
++    match = re.search(r'^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
++    if not match:
++        raise RuntimeError('Could not parse output of RNAfold for seq', pred_solution, ':', out)
++    return match.group(2)
+ 
+ def check_answer(pred_solution, dot_bracket):
+     '''Checks percentage of dot-bracket agreement between a predicted structure and target structure.'''
+diff --git a/SentRNA/util/featurize_util.py b/SentRNA/util/featurize_util.py
+index 95817a4..aaf4564 100644
+--- a/SentRNA/util/featurize_util.py
++++ b/SentRNA/util/featurize_util.py
+@@ -1,5 +1,7 @@
+ import numpy as np
+ import os
++import subprocess
++import tempfile
+ from mutinf import *
+ from compute_mfe import *
+ import random
+@@ -89,12 +91,19 @@ def generate_label(base):
+ # Data parsing functions
+ def generate_2d(dot_bracket):
+   '''Generate a 2d representation of a dot bracket string and puzzle solution.'''
++  tmpdir = tempfile.mkdtemp()
++  oldcwd = os.getcwd()
++  os.chdir(tmpdir)
++
+   inputs = open('input', 'w')
+   inputs.write('A' * len(dot_bracket) + '\n')
+   inputs.write(dot_bracket)
+   inputs.close()
++
+   os.system('RNAplot < input')
+ 
++  os.chdir(oldcwd)
++  return tmpdir
+ 
+ def parse_ps(ps):
+   '''Parses a RNAplot output file and returns:
+@@ -140,8 +149,9 @@ def parse_ps(ps):
+ 
+ # RNAplot
+ def draw_structure_rnaplot(dot_bracket):
+-    generate_2d(dot_bracket)
+-    coords, pairs, _ = parse_ps('rna.ps')
++    tmpdir = generate_2d(dot_bracket)
++    coords, pairs, _ = parse_ps(tmpdir + '/rna.ps')
++    os.system('rm -r ' + tmpdir)
+     return coords, pairs
+ 
+ # Eterna

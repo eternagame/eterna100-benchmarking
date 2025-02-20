@@ -1,0 +1,109 @@
+diff --git a/src/learna/design_rna.py b/src/learna/design_rna.py
+index 89d0441..7ba7203 100644
+--- a/src/learna/design_rna.py
++++ b/src/learna/design_rna.py
+@@ -162,6 +162,8 @@ if __name__ == "__main__":
+     parser.add_argument("--num_lstm_layers", type=int, help="The number of lstm layers")
+     parser.add_argument("--embedding_size", type=int, help="The size of the embedding")
+ 
++    parser.add_argument("--vienna_version", type=str, help="Vienna version")
++
+     args = parser.parse_args()
+ 
+     network_config = NetworkConfig(
+@@ -183,6 +185,7 @@ if __name__ == "__main__":
+         mutation_threshold=args.mutation_threshold,
+         reward_exponent=args.reward_exponent,
+         state_radius=args.state_radius,
++        vienna_version=args.vienna_version,
+     )
+     dot_brackets = parse_dot_brackets(
+         dataset=args.dataset,
+diff --git a/src/learna/environment.py b/src/learna/environment.py
+index c15264a..f5e24a7 100644
+--- a/src/learna/environment.py
++++ b/src/learna/environment.py
+@@ -7,8 +7,20 @@ from distance import hamming
+ import numpy as np
+ from tensorforce.environments import Environment
+ 
+-from RNA import fold
+-
++# from RNA import fold
++import os, re
++from subprocess import Popen, PIPE, STDOUT
++external_path = os.path.join(os.path.dirname(__file__), '../../..')
++def fold(seq, version):
++    args = [external_path + '/ViennaRNA-' + version + '/build/bin/RNAfold', '-T','37.0']
++    if version.startswith('2.'):
++        args.append('--noPS')
++    p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
++    out = p.communicate(input=''.join(seq))[0]
++    match = re.search(r'^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
++    if not match:
++        raise RuntimeError('Could not parse output of RNAfold for seq', seq, ':', out)
++    return match.group(2), match.group(3)
+ 
+ @dataclass
+ class RnaDesignEnvironmentConfig:
+@@ -30,6 +42,7 @@ class RnaDesignEnvironmentConfig:
+     state_radius: int = 5
+     use_conv: bool = True
+     use_embedding: bool = False
++    vienna_version: str = '2.6.4'
+ 
+ 
+ def _string_difference_indices(s1, s2):
+@@ -289,15 +302,18 @@ class RnaDesignEnvironment(Environment):
+         differing_sites = _string_difference_indices(
+             self.target.dot_bracket, folded_design
+         )
+-        hamming_distances = []
++        best_distance = None
+         for mutation in product("AGCU", repeat=len(differing_sites)):
+             mutated = self.design.get_mutated(mutation, differing_sites)
+-            folded_mutated, _ = fold(mutated.primary)
++            folded_mutated, _ = fold(mutated.primary, self._env_config.vienna_version)
+             hamming_distance = hamming(folded_mutated, self.target.dot_bracket)
+-            hamming_distances.append(hamming_distance)
+             if hamming_distance == 0:  # For better timing results
++                self.design = mutated
+                 return 0
+-        return min(hamming_distances)
++            if best_distance is None or hamming_distance < best_distance:
++                best_distance = hamming_distance
++        
++        return best_distance
+ 
+     def _get_reward(self, terminal):
+         """
+@@ -312,7 +328,7 @@ class RnaDesignEnvironment(Environment):
+         if not terminal:
+             return 0
+ 
+-        folded_design, _ = fold(self.design.primary)
++        folded_design, _ = fold(self.design.primary, self._env_config.vienna_version)
+         hamming_distance = hamming(folded_design, self.target.dot_bracket)
+         if 0 < hamming_distance < self._env_config.mutation_threshold:
+             hamming_distance = self._local_improvement(folded_design)
+diff --git a/src/learna/learn_to_design_rna.py b/src/learna/learn_to_design_rna.py
+index c4b8512..1003626 100644
+--- a/src/learna/learn_to_design_rna.py
++++ b/src/learna/learn_to_design_rna.py
+@@ -150,6 +150,8 @@ if __name__ == "__main__":
+         "--num_lstm_layers", type=int, default=0, help="Number of lstm layers"
+     )
+ 
++    parser.add_argument("--vienna_version", type=str, help="Vienna version")
++
+     args = parser.parse_args()
+ 
+     network_config = NetworkConfig(
+@@ -166,6 +168,7 @@ if __name__ == "__main__":
+         mutation_threshold=args.mutation_threshold,
+         reward_exponent=args.reward_exponent,
+         state_radius=args.state_radius,
++        vienna_version=args.vienna_version,
+     )
+     dot_brackets = parse_dot_brackets(
+         dataset=args.dataset,

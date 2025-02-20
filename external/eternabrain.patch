@@ -1,0 +1,706 @@
+diff --git a/requirements.txt b/requirements.txt
+index 3f17530..978c0a1 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,4 +1,4 @@
+-tensorflow==1.15.5
++tensorflow==1.15.0
+ scikit-learn>=0.18.1
+ numpy>=1.12.1
+ seaborn>=0.7.1
+diff --git a/rna-prediction/baseCNN.py b/rna-prediction/baseCNN.py
+index 3a0244d..0e4ba45 100644
+--- a/rna-prediction/baseCNN.py
++++ b/rna-prediction/baseCNN.py
+@@ -14,7 +14,8 @@ import pickle
+ #from getData import getPid
+ from random import shuffle
+ 
+-NAME = 'baseCNNX'
++NAME = 'base' + os.environ['MODEL_NAME']
++FEAT_NAME = os.environ['FEATURESET_NAME']
+ NUM_FEATURES = 9
+ TRAIN_KEEP_PROB = 0.9
+ TEST_KEEP_PROB = 1.0
+@@ -22,7 +23,7 @@ learning_rate = 0.0001
+ ne = 150
+ tb_path = '/tensorboard/' + NAME
+ 
+-train = 30000
++# train = 30000
+ test = 100
+ abs_max = 400
+ len_puzzle = abs_max
+@@ -39,25 +40,26 @@ with open(os.getcwd()+'/movesets/teaching-puzzle-ids.txt') as f:
+ # you may also want to remove whitespace characters like `\n` at the end of each line
+ content = [x.strip() for x in content]
+ content = [int(x) for x in content]
+-progression = [6502966,6502968,6502973,6502976,6502984,6502985,6502993,
+-                6502994,6502995,6502996,6502997,6502998,6502999,6503000] # 6502957
+-content.extend(progression)
+-
+-# content = getPid()
+-content.remove(6502966)
+-content.remove(6502976)
+-content.remove(6502984)
+-# content.remove(4960718)
+-# content.remove(3468526)
++if os.environ['TRAIN_EXTENDED_PUZZLES'] == 'true':
++    progression = [6502966,6502968,6502973,6502976,6502984,6502985,6502993,
++                    6502994,6502995,6502996,6502997,6502998,6502999,6503000] # 6502957
++    content.extend(progression)
++
++    # content = getPid()
++    content.remove(6502966)
++    content.remove(6502976)
++    content.remove(6502984)
++    # content.remove(4960718)
++    # content.remove(3468526)
+ print(content)
+ real_X = []
+ real_y = []
+ pids = []
+ for pid in content:
+     try:
+-        feats = pickle.load(open(os.getcwd()+'/pickles/X5-exp-loc-'+str(pid),'rb'))
+-        ybase = pickle.load(open(os.getcwd()+'/pickles/y5-exp-base-'+str(pid),'rb'))
+-        yloc = pickle.load(open(os.getcwd()+'/pickles/y5-exp-loc-'+str(pid),'rb'))
++        feats = pickle.load(open(os.getcwd()+'/pickles/X-' + FEAT_NAME + '-loc-'+str(pid),'rb'))
++        ybase = pickle.load(open(os.getcwd()+'/pickles/y-' + FEAT_NAME + '-base-'+str(pid),'rb'))
++        yloc = pickle.load(open(os.getcwd()+'/pickles/y-' + FEAT_NAME + '-loc-'+str(pid),'rb'))
+         for i in range(len(feats)):
+             feats[i].append(yloc[i])
+         real_X.extend(feats)
+@@ -92,18 +94,6 @@ for i in indxs:
+              for k in j:
+                  k.extend([0]*(abs_max - len(k))) #k.extend([0]*(max(max_lens) - len(k)))
+ 
+-#print abs_max
+-
+-'''
+-Used for testing accuracies without certain features
+-'''
+-# for i in real_X:
+-#     del i[8]
+-
+-
+-print(len(real_X), len(real_y))
+-print(np.array(real_X).shape, np.array(real_y).shape)
+-
+ '''
+ Uncomment for altering training data (training on half experts)
+ '''
+@@ -133,7 +123,7 @@ The first '#' statement is for half experts, the second is for half players
+ # print test_real_X.shape
+ # print test_real_y.shape
+ 
+-
++train = len(real_X) - test
+ real_X_9 = np.array(real_X[0:train]).reshape([-1,TF_SHAPE])
+ real_y_9 = np.array(real_y[0:train])
+ test_real_X = np.array(real_X[train:train+test]).reshape([-1,TF_SHAPE])
+diff --git a/rna-prediction/eterna_score.py b/rna-prediction/eterna_score.py
+index 8477718..33bdccb 100644
+--- a/rna-prediction/eterna_score.py
++++ b/rna-prediction/eterna_score.py
+@@ -3,7 +3,8 @@ Function that will take RNA sequence as input and output Eternabot score for rew
+ @authot: Rohan Koodli
+ '''
+ 
+-import RNA
++#import RNA
++import vienna
+ #import ensemble_utils
+ #from eterna_utils import get_dotplot, get_rna_elements_from_secstruct, get_pairmap_from_secstruct
+ 
+@@ -64,7 +65,7 @@ def convert(base_seq):
+     #     elif np.array_equal(i,C):
+     #         str_struc.append('C')
+     struc = base_seq
+-    s,e = RNA.fold(struc)
++    s,e = vienna.fold(struc)
+     return s,e,struc
+ '''
+ def eternabot_score(seq):
+diff --git a/rna-prediction/eternabrain.py b/rna-prediction/eternabrain.py
+index adeaf58..3aea288 100644
+--- a/rna-prediction/eternabrain.py
++++ b/rna-prediction/eternabrain.py
+@@ -6,7 +6,8 @@ Contains function to design RNA sequence using EternaBrain algorithm
+ import tensorflow as tf
+ import os
+ import numpy as np
+-import RNA
++#import RNA
++import vienna
+ import copy
+ from numpy.random import choice
+ from difflib import SequenceMatcher
+@@ -92,7 +93,7 @@ def design(dot_bracket, nucleotides, locks, ce=0, te=0, MIN_THRESHOLD=0.6, MAX_I
+ 
+     base_seq = (convert_to_list(nucleotides)) + ([0]*(len_longest - len_puzzle))
+     # cdb = '.'*len_puzzle
+-    current_struc = (encode_struc(RNA.fold(nucleotides)[0])) + ([0]*(len_longest - len_puzzle))
++    current_struc = (encode_struc(vienna.fold(nucleotides)[0])) + ([0]*(len_longest - len_puzzle))
+     target_struc = encode_struc(dot_bracket) + ([0]*(len_longest - len_puzzle))
+     current_energy = [ce] + ([0]*(len_longest - 1))
+     target_energy = [te] + ([0]*(len_longest - 1))
+@@ -184,7 +185,7 @@ def design(dot_bracket, nucleotides, locks, ce=0, te=0, MIN_THRESHOLD=0.6, MAX_I
+                 else:
+                     continue
+             str_seq = ''.join(str_seq)
+-            str_struc,current_e = RNA.fold(str_seq)
++            str_struc,current_e = vienna.fold(str_seq)
+             current_pm = format_pairmap(str_struc)
+             #print str_struc
+             #print len(str_struc)
+@@ -201,7 +202,7 @@ def design(dot_bracket, nucleotides, locks, ce=0, te=0, MIN_THRESHOLD=0.6, MAX_I
+                 else:
+                     continue
+             rna_struc = ''.join(rna_struc)
+-            target_e = RNA.energy_of_structure(str_seq,rna_struc,0)
++            target_e = vienna.energy_of_structure(str_seq,rna_struc,0)
+             enc_struc = []
+ 
+             for i in str_struc:
+diff --git a/rna-prediction/experts.py b/rna-prediction/experts.py
+index 79aeeef..4ce8ca3 100644
+--- a/rna-prediction/experts.py
++++ b/rna-prediction/experts.py
+@@ -11,6 +11,8 @@ import pickle
+ from getData import getPid
+ from stats import stats
+ 
++NAME = os.environ['FEATURESET_NAME']
++
+ with open(os.getcwd()+'/movesets/teaching-puzzle-ids.txt') as f:
+     progression = f.readlines()
+ # you may also want to remove whitespace characters like `\n` at the end of each line
+@@ -83,9 +85,9 @@ def prep(pid):
+ 
+     #bases = base_sequence_at_current_time_pr(encoded[1006],encoded_bf[1006])
+     X = np.array(structure_and_energy_at_current_time(bases,pid,data,len_longest))
+-    np.save(open(os.getcwd()+'/npsaves/X-exp-'+str(pid),'wb'),X)
+-    np.save(open(os.getcwd()+'/npsaves/y-exp-base-'+str(pid),'wb'),encoded_base)
+-    np.save(open(os.getcwd()+'/npsaves/y-exp-loc-'+str(pid),'wb'),encoded_loc)
++    np.save(open(os.getcwd()+'/npsaves/X-' + NAME + '-'+str(pid),'wb'),X)
++    np.save(open(os.getcwd()+'/npsaves/y-' + NAME + '-base-'+str(pid),'wb'),encoded_base)
++    np.save(open(os.getcwd()+'/npsaves/y-' + NAME + '-loc-'+str(pid),'wb'),encoded_loc)
+ 
+ def read(pid,uidList):
+     """
+@@ -157,9 +159,9 @@ def read(pid,uidList):
+     # np.save(open(os.getcwd()+'/npsaves/y-exp-loc-eli.npy','wb'),encoded_loc)
+ 
+     #pickle.dump(X2,open(os.getcwd()+'/pickles/X-exp-base-'+str(pid),'wb'))
+-    pickle.dump(X, open(os.getcwd()+'/pickles/X-hog-loc-'+str(pid),'wb'))
+-    pickle.dump(encoded_base,open(os.getcwd()+'/pickles/y-hog-base-'+str(pid),'wb'))
+-    pickle.dump(encoded_loc,open(os.getcwd()+'/pickles/y-hog-loc-'+str(pid),'wb'))
++    pickle.dump(X, open(os.getcwd()+'/pickles/X-' + NAME + '-loc-'+str(pid),'wb'))
++    pickle.dump(encoded_base,open(os.getcwd()+'/pickles/y-' + NAME + '-base-'+str(pid),'wb'))
++    pickle.dump(encoded_loc,open(os.getcwd()+'/pickles/y-' + NAME + '-loc-'+str(pid),'wb'))
+ 
+ def read_uid(uidList):
+     """
+@@ -263,43 +265,16 @@ def read2(data,pids):
+             #print 'done formatting list'
+             ##print 'user %i done with pid %i' % (user,pid)
+     ##print time.time() - start()
+-        #print "complete data read"
+-        encoded_bf = []
+-        for start in bf_list:
+-           enc = []
+-           for i in start:
+-               if i == 'A':
+-                   enc.append(1)
+-               elif i == 'U':
+-                   enc.append(2)
+-               elif i == 'G':
+-                   enc.append(3)
+-               elif i == 'C':
+-                   enc.append(4)
+-           encoded_bf.append(enc)
+-        #print "encoded begin_from"
+-
+-        encoded = encode_movesets_style_pr(final_dict)
+-        encoded_base = (encode_bases(final_dict))
+-        encoded_loc = (encode_location(final_dict,len_longest))
+-        #print 'encoded base and location'
+-        #print len(encoded), len(encoded_bf), len(final_dict)
+-        bases = base_sequence_at_current_time_pr(encoded,encoded_bf)
+-        #print 'encoded base seqs'
+-        #bases = base_sequence_at_current_time_pr(encoded[1006],encoded_bf[1006])
+-        X = (structure_and_energy_at_current_time(bases,pid))
+-        #X2 = (structure_and_energy_at_current_time_with_location(bases,pid,final_dict,len_longest))
+-        #print 'encoded strucs energy and locks'
+-        #print len(X)
++        #print "complete data read"pickle.dump
+         # np.save(open(os.getcwd()+'/npsaves/X-exp-base-eli.npy','wb'),X2)
+         # np.save(open(os.getcwd()+'/npsaves/X-exp-loc-eli.npy','wb'),X)
+         # np.save(open(os.getcwd()+'/npsaves/y-exp-base-eli.npy','wb'),encoded_base)
+         # np.save(open(os.getcwd()+'/npsaves/y-exp-loc-eli.npy','wb'),encoded_loc)
+ 
+         #pickle.dump(X2,open(os.getcwd()+'/pickles/X-exp-base-'+str(pid),'wb'))
+-        pickle.dump(X, open(os.getcwd()+'/pickles/X-hog-loc-'+str(pid),'wb'))
+-        pickle.dump(encoded_base,open(os.getcwd()+'/pickles/y-hog-base-'+str(pid),'wb'))
+-        pickle.dump(encoded_loc,open(os.getcwd()+'/pickles/y-hog-loc-'+str(pid),'wb'))
++        pickle.dump(X, open(os.getcwd()+'/pickles/X-' + NAME + '-loc-'+str(pid),'wb'))
++        pickle.dump(encoded_base,open(os.getcwd()+'/pickles/y-' + NAME + '-base-'+str(pid),'wb'))
++        pickle.dump(encoded_loc,open(os.getcwd()+'/pickles/y-' + NAME + '-loc-'+str(pid),'wb'))
+ 
+ def run(_):
+     """
+@@ -312,14 +287,15 @@ def run(_):
+ # for i in reversed(content[:content.index(7165340)]):
+ #     read(i,uidList)
+ 
+-# for i in range(len(content)/2):
+-#     read(content[i],uidList)
++for puz in content:
++    print('Processing puzzle', puz)
++    read(puz, uidList)
+ 
+-if __name__ == '__main__':
+-    from pandas import ExcelWriter
+-    writer = ExcelWriter(os.getcwd() + '/movesets/supplementaltable1.xlsx')
+-    x = stats(content, uidList)
+-    x.to_excel(writer)
++#if __name__ == '__main__':
++#    from pandas import ExcelWriter
++#    writer = ExcelWriter(os.getcwd() + '/movesets/supplementaltable1.xlsx')
++#    x = stats(content, uidList)
++#    x.to_excel(writer)
+ 
+ # #print structure_avg(extra)
+ 
+diff --git a/rna-prediction/getData.py b/rna-prediction/getData.py
+index 43969b6..0af975b 100644
+--- a/rna-prediction/getData.py
++++ b/rna-prediction/getData.py
+@@ -8,7 +8,8 @@ Created on Thu Jan 05 18:30:26 2017
+ #from selenium import webdriver
+ #from selenium.webdriver.common.keys import Keys
+ #import time
+-import RNA
++#import RNA
++import vienna
+ import pandas as pd
+ import os
+ 
+@@ -61,7 +62,7 @@ def getStructure(sequence):
+             base_seq.append('C')
+ 
+     base_seq = ''.join(base_seq)
+-    struc,energy = RNA.fold(base_seq)
++    struc,energy = vienna.fold(base_seq)
+     e = [energy]+((len(base_seq)-1)*[0.0])
+     return struc,e
+ 
+@@ -97,7 +98,7 @@ def getTargetEnergy(sequence,structure):
+             struc.append(')')
+     struc = ''.join(struc)
+ 
+-    target_energy = RNA.energy_of_structure(base_seq,struc,0)
++    target_energy = vienna.energy_of_structure(base_seq,struc,0)
+     e = [target_energy]+((len(base_seq)-1)*[0.0])
+ 
+     return e
+diff --git a/rna-prediction/locationCNN.py b/rna-prediction/locationCNN.py
+index b2d150b..c4d29e9 100644
+--- a/rna-prediction/locationCNN.py
++++ b/rna-prediction/locationCNN.py
+@@ -13,7 +13,8 @@ import tensorflow as tf
+ import pickle
+ from random import shuffle
+ 
+-NAME = 'locationCNNX'
++NAME = 'location' + os.environ['MODEL_NAME']
++FEAT_NAME = os.environ['FEATURESET_NAME']
+ NUM_FEATURES = 8
+ TRAIN_KEEP_PROB = 0.9
+ TEST_KEEP_PROB = 1.0
+@@ -21,7 +22,7 @@ learning_rate = 0.0001
+ ne = 150
+ tb_path = '/tensorboard/' + NAME
+ 
+-train = 30000
++# train = 30000
+ test = 100
+ abs_max = 400
+ len_puzzle = abs_max
+@@ -38,17 +39,18 @@ with open(os.getcwd()+'/movesets/teaching-puzzle-ids.txt') as f:
+ # you may also want to remove whitespace characters like `\n` at the end of each line
+ content = [x.strip() for x in content]
+ content = [int(x) for x in content]
+-progression = [6502966,6502968,6502973,6502976,6502984,6502985,6502993, \
+-                6502994,6502995,6502996,6502997,6502998,6502999,6503000] # 6502957
+-content.extend(progression)
+-#content = getPid()
+-content.remove(6502966)
+-content.remove(6502976)
+-content.remove(6502984)
+-# content.remove(4960718)
+-# content.remove(3468526)
+-# content.remove(3468547)
+-#content.remove(3522605)
++if os.environ['TRAIN_EXTENDED_PUZZLES'] == 'true':
++    progression = [6502966,6502968,6502973,6502976,6502984,6502985,6502993, \
++                    6502994,6502995,6502996,6502997,6502998,6502999,6503000] # 6502957
++    content.extend(progression)
++    #content = getPid()
++    content.remove(6502966)
++    content.remove(6502976)
++    content.remove(6502984)
++    # content.remove(4960718)
++    # content.remove(3468526)
++    # content.remove(3468547)
++    #content.remove(3522605)
+ 
+ real_X = []
+ real_y = []
+@@ -57,8 +59,8 @@ specs_X = []
+ specs_y = []
+ for pid in content:
+     try:
+-        feats = pickle.load(open(os.getcwd()+'/pickles/X5-exp-loc-'+str(pid),'rb'))
+-        yloc = pickle.load(open(os.getcwd()+'/pickles/y5-exp-loc-'+str(pid),'rb'))
++        feats = pickle.load(open(os.getcwd()+'/pickles/X-' + FEAT_NAME + '-loc-'+str(pid),'rb'))
++        yloc = pickle.load(open(os.getcwd()+'/pickles/y-' + FEAT_NAME + '-loc-'+str(pid),'rb'))
+         if np.count_nonzero(np.array(feats[0])) <= 50:
+             specs_X.extend(feats)
+             specs_y.extend(yloc)
+@@ -141,7 +143,7 @@ The first '#' is for half experts, the second is for half players
+ # print real_y_9.shape
+ # print test_real_X.shape
+ # print test_real_y.shape
+-
++train = len(real_X) - test
+ real_X_9 = np.array(real_X[0:train]).reshape([-1,TF_SHAPE])
+ real_y_9 = np.array(real_y[0:train])
+ test_real_X = np.array(real_X[train:train+test]).reshape([-1,TF_SHAPE])
+@@ -163,7 +165,7 @@ print("Data prepped")
+ # test_ms0 = np.array([[4,20],[3,15]])
+ # test_ms0 = np.array([[0,0,0,1],[1,0,0,0]]) # just base
+ 
+-n_classes = 350
++n_classes = 400
+ batch_size = 100 # load 100 features at a time
+ 
+ x = tf.placeholder('float',[None,TF_SHAPE],name="x_placeholder") # 216 with enc0
+diff --git a/rna-prediction/predict.py b/rna-prediction/predict.py
+index 42a8a94..4181630 100644
+--- a/rna-prediction/predict.py
++++ b/rna-prediction/predict.py
+@@ -1,7 +1,8 @@
+ import tensorflow as tf
+ import os
+ import numpy as np
+-import RNA
++#import RNA
++import vienna
+ import copy
+ from numpy.random import choice
+ from difflib import SequenceMatcher
+@@ -56,7 +57,7 @@ def convert_to_list(base_seq):
+ bs = 'A'*len_puzzle
+ base_seq = (convert_to_list(bs)) + ([0]*(len_longest - len_puzzle))
+ # cdb = '.'*len_puzzle
+-current_struc = (encode_struc(RNA.fold(bs)[0])) + ([0]*(len_longest - len_puzzle))
++current_struc = (encode_struc(vienna.fold(bs)[0])) + ([0]*(len_longest - len_puzzle))
+ target_struc = encode_struc(dot_bracket) + ([0]*(len_longest - len_puzzle))
+ current_energy = [0.0] + ([0]*(len_longest - 1))
+ target_energy = [0.0] + ([0]*(len_longest - 1))
+@@ -152,7 +153,7 @@ for i in range(1000):
+             else:
+                 continue
+         str_seq = ''.join(str_seq)
+-        str_struc,current_e = RNA.fold(str_seq)
++        str_struc,current_e = vienna.fold(str_seq)
+         print str_struc
+         #print len(str_struc)
+         print similar(str_struc,dot_bracket)
+@@ -167,7 +168,7 @@ for i in range(1000):
+             else:
+                 continue
+         rna_struc = ''.join(rna_struc)
+-        target_e = RNA.energy_of_structure(str_seq,rna_struc,0)
++        target_e = vienna.energy_of_structure(str_seq,rna_struc,0)
+         enc_struc = []
+         for i in str_struc:
+             if i == '.':
+diff --git a/rna-prediction/predict100.py b/rna-prediction/predict100.py
+index aca27b1..6dd956e 100644
+--- a/rna-prediction/predict100.py
++++ b/rna-prediction/predict100.py
+@@ -7,7 +7,7 @@ import tensorflow as tf
+ import os
+ import pickle
+ import numpy as np
+-import RNA
++#import RNA
+ import copy
+ from numpy.random import choice
+ from difflib import SequenceMatcher
+diff --git a/rna-prediction/predict_pm.py b/rna-prediction/predict_pm.py
+index 4a48d2d..80bf79e 100644
+--- a/rna-prediction/predict_pm.py
++++ b/rna-prediction/predict_pm.py
+@@ -8,7 +8,8 @@ import tensorflow as tf
+ import os
+ import pickle
+ import numpy as np
+-import RNA
++#import RNA
++import vienna
+ import copy
+ from numpy.random import choice
+ from difflib import SequenceMatcher
+@@ -87,7 +88,7 @@ def predict(secondary_structure, vienna_version=1, bool_print=True, vienna_path=
+ 
+     LOCATION_FEATURES = 8
+     BASE_FEATURES = 9
+-    NAME = 'CNN15'
++    NAME = os.environ['MODEL_NAME']
+ 
+     MIN_THRESHOLD = 0.6
+     MAX_ITERATIONS = len_puzzle*2
+@@ -98,7 +99,7 @@ def predict(secondary_structure, vienna_version=1, bool_print=True, vienna_path=
+ 
+     base_seq = (convert_to_list(NUCLEOTIDES)) + ([0]*(len_longest - len_puzzle))
+     # cdb = '.'*len_puzzle
+-    current_struc = (encode_struc(RNA.fold(NUCLEOTIDES)[0])) + ([0]*(len_longest - len_puzzle))
++    current_struc = (encode_struc(vienna.fold(NUCLEOTIDES)[0])) + ([0]*(len_longest - len_puzzle))
+     target_struc = encode_struc(secondary_structure) + ([0]*(len_longest - len_puzzle))
+     current_energy = [ce] + ([0]*(len_longest - 1))
+     target_energy = [te] + ([0]*(len_longest - 1))
+@@ -116,7 +117,6 @@ def predict(secondary_structure, vienna_version=1, bool_print=True, vienna_path=
+     '''
+     #inputs2 = np.array([base_seq,current_energy,target_energy,current_pm,target_pm,locks])
+ 
+-
+     inputs = inputs2.reshape([-1,TF_SHAPE])
+ 
+     with tf.Graph().as_default() as base_graph:
+@@ -154,6 +154,20 @@ def predict(secondary_structure, vienna_version=1, bool_print=True, vienna_path=
+         if np.all(inputs2[1] == inputs2[2]):
+             if bool_print:
+                 print("Puzzle Solved")
++            reg = []
++            for i in inputs2[0]:
++                if i == 1:
++                    reg.append('A')
++                elif i == 2:
++                    reg.append('U')
++                elif i == 3:
++                    reg.append('G')
++                elif i == 4:
++                    reg.append('C')
++                else:
++                    continue
++            reg = ''.join(reg)
++            print(reg)
+             return True
+         else:
+             location_array = ((sess2.run(location_weights,location_feed_dict))[0])
+@@ -208,7 +222,7 @@ def predict(secondary_structure, vienna_version=1, bool_print=True, vienna_path=
+                 else:
+                     continue
+             str_seq = ''.join(str_seq)
+-            str_struc,current_e = RNA.fold(str_seq)
++            str_struc,current_e = vienna.fold(str_seq)
+             current_pm = format_pairmap(str_struc)
+ 
+             if bool_print:
+@@ -226,7 +240,7 @@ def predict(secondary_structure, vienna_version=1, bool_print=True, vienna_path=
+                 else:
+                     continue
+             rna_struc = ''.join(rna_struc)
+-            target_e = RNA.energy_of_structure(str_seq,rna_struc,0)
++            target_e = vienna.energy_of_structure(str_seq,rna_struc,0)
+             enc_struc = []
+             for i in str_struc:
+                 if i == '.':
+diff --git a/rna-prediction/q-learning.py b/rna-prediction/q-learning.py
+index 9db688d..d8854c4 100644
+--- a/rna-prediction/q-learning.py
++++ b/rna-prediction/q-learning.py
+@@ -1,7 +1,8 @@
+ import tensorflow as tf
+ import numpy as np
+ import copy
+-import RNA
++#import RNA
++import vienna
+ from eterna_score import eternabot_score
+ from difflib import SequenceMatcher
+ 
+@@ -24,7 +25,7 @@ def convert(base_seq):
+         elif i == [0,0,0,1]:
+             str_struc.append('C')
+     struc = ''.join(str_struc)
+-    s,_ = RNA.fold(struc)
++    s,_ = vienna.fold(struc)
+     return_struc = []
+     for i in s:
+         if i == '.':
+@@ -110,7 +111,7 @@ def convert_to_struc(base_seq):
+         elif i == [0,0,0,1]:
+             str_struc.append('C')
+     struc = ''.join(str_struc)
+-    s,_ = RNA.fold(struc)
++    s,_ = vienna.fold(struc)
+     return_struc = []
+     for i in s:
+         if i == '.':
+@@ -143,7 +144,7 @@ len_puzzle_float = len(target_struc) * 1.0
+ # GAACGCACCUGCCUGUUUGGGGAGUAUGAA   GAACGCACCUGCCUGUUUGGGUAGCAUGAA   GAACGCACCUGCCUGUCUGGGUAGCAUGAA  GAACUCACCUGCCUGUCUUGGUAGCAUCAA
+ seq = 'GUAAGUAGUAUAAAAUGAGGACCAAGAGUAAAGGUAAAUACUAAAUGU'
+ current_seq = convert_to_list(seq)
+-cdb,_ = RNA.fold(seq)
++cdb,_ = vienna.fold(seq)
+ 
+ NUM_STATES = len_puzzle #n_states
+ NUM_ACTIONS = 4
+diff --git a/rna-prediction/readData.py b/rna-prediction/readData.py
+index 627bf43..bb81f5d 100644
+--- a/rna-prediction/readData.py
++++ b/rna-prediction/readData.py
+@@ -10,6 +10,13 @@ import os
+ import numpy as np
+ from eterna_score import get_pairmap_from_secstruct
+ 
++# Memoize this because loading it takes a super long time
++moveset_dataFrame=None
++def load_movesets():
++    global moveset_dataFrame
++    if moveset_dataFrame is None:
++        moveset_dataFrame = pd.read_csv(os.getcwd()+'/movesets/moveset6-22a.txt', sep=" ", header="infer", delimiter='\t')
++
+ def experience(threshold):
+     '''
+     Returns player IDs of players who have solved over a certain threshold of puzzles
+@@ -33,7 +40,7 @@ def read_movesets_uid(uid): # get data from user ID
+     :return: The move sets of that player
+     :return: The list of puzzle IDs of puzzles that he/she has solved
+     '''
+-    moveset_dataFrame = pd.read_csv(os.getcwd()+'/movesets/moveset6-22a.txt', sep=" ", header="infer", delimiter='\t')
++    load_movesets()
+     puzzles_uid = moveset_dataFrame.loc[moveset_dataFrame['uid'] == uid]
+     plist = list(puzzles_uid['move_set'])
+     pidList = list(puzzles_uid['pid'])
+@@ -54,7 +61,7 @@ def read_movesets_uid_pid(uid,pid,df='list'): # get data from user ID
+     :param df: Whether you want the returned move sets to be in a pandas dataframe or a list
+     :return: The move sets either in a list or a pandas dataframe
+     """
+-    moveset_dataFrame = pd.read_csv(os.getcwd()+'/movesets/moveset6-22a.txt', sep=" ", header="infer", delimiter='\t')
++    load_movesets()
+     puzzles1 = moveset_dataFrame.loc[moveset_dataFrame['uid'] == uid]
+     puzzles2 = puzzles1.loc[puzzles1['pid'] == pid]
+     if df == "list":
+diff --git a/rna-prediction/sap1.py b/rna-prediction/sap1.py
+index 88c8a3e..5c01523 100644
+--- a/rna-prediction/sap1.py
++++ b/rna-prediction/sap1.py
+@@ -7,7 +7,8 @@ First process of the SAP
+ import copy
+ import sys
+ import re
+-import RNA
++#import RNA
++import vienna
+ #from eterna_score import eternabot_score
+ from difflib import SequenceMatcher
+ #from eterna_score import eternabot_score
+@@ -18,17 +19,7 @@ from subprocess import Popen, PIPE, STDOUT
+ vienna_path='../../../EteRNABot/eternabot/./RNAfold'
+ 
+ def fold(seq, vienna_version=1, vienna_path='../../../EteRNABot/eternabot/./RNAfold'):
+-    if vienna_version == 1:
+-        if sys.version_info[:3] > (3,0):
+-            p = Popen([vienna_path, '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
+-        else:
+-            p = Popen([vienna_path, '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+-        pair = p.communicate(input=''.join(seq))[0]
+-        formatted = re.split('\s+| \(?\s?',pair)
+-        s = formatted[1]
+-    else:
+-        s, _ = RNA.fold(seq)
+-    return s
++    return vienna.fold(seq, for_sap=True)[0]
+     
+ 
+ def hot_one_state(seq,index,base):
+diff --git a/rna-prediction/sap2.py b/rna-prediction/sap2.py
+index 8679b09..7e14727 100644
+--- a/rna-prediction/sap2.py
++++ b/rna-prediction/sap2.py
+@@ -7,7 +7,8 @@ Second process of the SAP
+ import sys
+ import numpy as np
+ from eterna_score import get_pairmap_from_secstruct
+-import RNA
++#import RNA
++import vienna
+ from subprocess import Popen, PIPE, STDOUT
+ import re
+ from difflib import SequenceMatcher
+@@ -57,19 +58,7 @@ def str_to_num(s):
+ 
+ 
+ def pairmap_from_sequence(seq, vienna_version, vienna_path='../../../EteRNABot/eternabot/./RNAfold'):
+-    new_struc = ''
+-    if vienna_version == 1:
+-        if sys.version_info[:3] > (3,0):
+-            p = Popen([vienna_path, '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8')
+-        else:
+-            p = Popen([vienna_path, '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+-        pair = p.communicate(input=''.join(seq))[0]
+-        formatted = re.split('\s+| \(?\s?',pair)
+-        new_struc = formatted[1]
+-    elif vienna_version == 2:
+-        new_struc = RNA.fold(''.join(seq))[0]
+-
+-    return get_pairmap_from_secstruct(new_struc)
++    return get_pairmap_from_secstruct(vienna.fold(seq, for_sap=True)[0])
+ 
+ dot_bracket = '.....((((..((((....)))).)))).....'
+ seq_str = 'A'*len(dot_bracket)
+@@ -97,7 +86,7 @@ def dsp(dot_bracket, seq_str, vienna_version='1', vienna_path='../../../EteRNABo
+     m = []
+     SOLVE = False
+ 
+-    current_struc,_ = RNA.fold(seq_str)
++    current_struc,_ = vienna.fold(seq_str, for_sap=True)
+     target_struc = encode_struc(dot_bracket)
+     target_pm = get_pairmap_from_secstruct(dot_bracket)
+     current_pm = get_pairmap_from_secstruct(current_struc)
+diff --git a/rna-prediction/vienna.py b/rna-prediction/vienna.py
+new file mode 100644
+index 0000000..ab9a82d
+--- /dev/null
++++ b/rna-prediction/vienna.py
+@@ -0,0 +1,24 @@
++import os, re
++from subprocess import Popen, PIPE, STDOUT
++
++def fold(seq, for_sap=False):
++    if for_sap:
++        bin_path = os.environ['SAP_VIENNA_BIN_PATH']
++    else:
++        bin_path = os.environ['VIENNA_BIN_PATH']
++    
++    args = [bin_path + '/RNAfold', '-T','37.0']
++    if 'ViennaRNA-2' in bin_path:
++        args.append('--noPS')
++    p = Popen(args, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
++    out = p.communicate(input=''.join(seq))[0]
++    match = re.search(r'^(?:WARNING:.+\n)*(.+)\n(.+)\s+\(\s*(.+)\)(?:\n(?:.|\n)+)?\n?$', out)
++    if not match:
++        raise RuntimeError('Could not parse output of RNAfold for seq', ''.join(seq), ':', out)
++    return match.group(2), match.group(3)
++
++def energy_of_structure(seq, struct, verbosity):
++    p = Popen([os.environ['VIENNA_BIN_PATH'] + '/RNAeval', '-T','37.0'], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
++    out = p.communicate(input=''.join(seq) + '\n' + ''.join(struct))[0]
++    
++    return float(re.search(r'^(WARNING: bases \d+ and \d+ \(\w+\) can\'t pair!\n)*(.+)\n(.+)\s+\(\s*(.+)\)$', out).group(4))

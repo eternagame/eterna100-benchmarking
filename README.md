@@ -2,12 +2,45 @@
 
 [![Paper](https://img.shields.io/badge/paper-bioRxiv-a82525)](https://www.biorxiv.org/content/10.1101/2021.08.26.457839v1)
 
-This repository contains RNA design algorithm solutions for the Eterna100-V1 and Eterna100-V2.
 
-Each subdirectory has that algorithm's solutions to Eterna100-V1 and Eterna100-V2 (eternabrain/ has 2 files, one with Vienna 1 solutions and the other with Vienna 2 solutions).
+Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1 and Eterna100-V2 benchmarks
 
-`eterna100_vienna1.txt` and `eterna100_vienna2.txt` contain puzzle IDs, structures, and attempted player solutions.
+## Setup
+1. System Prequisites:
+  * Unix environment (tested on Linux, other operating systems may require alternate processes for setting up external dependencies)
+  * An available CUDA device, Turing generation or earlier (for retraining Eternabrain if GPU acceleration is desired)
+2. Ensure the following prerequisites are installed:
+  * git and git-lfs
+  * Python 3.9+
+  * make, gcc, and g++ (tested with gcc10 and gcc14 - C++17 language feature support is required) for retriving and compiling external dependencies (along with git)
+  * Anaconda/miniconda (for isolated environments and python installations necessary for each algorithm)
+  * CUDA 10.0 and cuDNN 7.6 (for retraining Eternabrain if GPU acceleration is desired)
+3. Install python dependencies via pip install -r requirements.txt
+4. Prep external libraries with setup_external.sh
 
-`eterna100-v2-19-pids.txt` contains puzzle IDs for the original and new 19 redesigned puzzles that weren't solvable in Vienna 1. `eterna100-v2-19-solutions.csv` contains player solutions for each of the IDs in `eterna100-v2-19-pids.txt`.
+## Organization
 
-`scripts/` contains information on how to reproduce these results for every algorithm.
+`data/eterna100_puzzles.tsv`: Metadata for the Eterna100-V1 and Eterna100-V2 benchmarks
+
+`data/results.tsv`: Benchmarking results
+
+`external/`: External dependencies
+
+`scripts/algorithms`: Modules for benchmarking individual algorithms
+
+`scripts/util`: Utility modules
+
+`scripts/benchmark.py`: Script to run an algorithm benchmarks in a single configuration
+
+`scripts/queue_benchmarks.py`: Script to run algorithm benchmarks in bulk
+
+`scripts/queue_train.py`: Script to run retraining for machine learning models
+
+`scripts/stats.py`: Summarize benchmark results
+
+## Usage
+
+* To retrain machine learning models, run run `scripts/queue_train.py` (By default trains all models and runs sequentially - run `queue_train.py -h` for full usage information)
+* To benchmark an algorithm in a particular configuration, run `scripts/benchmark.py` (Run `benchmark.py -h` for full usage information)
+* To run benchmarks in bulk, run `scripts/queue_benchmarks.py` (By default runs all benchmarks and runs sequentially - run `queue_benchmarks.py -h` for full usage information)
+* To generate summary statistics, run `scripts/stats.py`
