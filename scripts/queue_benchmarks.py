@@ -158,7 +158,7 @@ def run(args):
                 all_results.to_csv(f'{DATA_DIR}/results.tsv', sep='\t', index=False)
     
     if args.scheduler == 'slurm':
-        batches = packer.pack(args.timeout)
+        batches = packer.pack(args.slurm_timeout * 60)
         jobs = [job for batch in batches for job in batch.jobs]
         tasks = [task for job in jobs for task in job.commands]
         print(f'Queueing {len(batches)} batches/{len(jobs)} jobs/{len(tasks)} benchmarks')
@@ -189,7 +189,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--scheduler', dest='scheduler', choices=['naive', 'slurm'], default='naive')
     parser.add_argument('--slurm-partition', dest='slurm_partition', type=str, default=None)
-    parser.add_argument('--timeout', dest='timeout', type=int, default=60*60*24)
+    parser.add_argument('--timeout', dest='timeout', type=int, default=60*60*24, help='Max amount of time a given solver is allowed to run, in seconds')
+    parser.add_argument('--slurm-timeout', dest='slurm_timeout', type=int, default=60*24, help='When running via slurm, the maximum amount of time allocated to a job, in minutes')
 
     parser.add_argument('--solver', dest='solver', choices=solvers, default=None)
     parser.add_argument('--folder', dest='folder', choices=['vienna1', 'vienna2'], default=None)
