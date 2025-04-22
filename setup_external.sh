@@ -86,6 +86,10 @@ conda create -qy -p ../eternabrain-env python=2.7
 # We pin grpcio to ensure it uses a prebuilt wheel
 ../eternabrain-env/bin/pip install -r requirements.txt grpcio==1.39.0
 
+if [ "$EBENCH_SKIP_PRETRAINED" != "1" ]; then
+    cp -R ../../retrained-models/eternabrain/models/* rna-prediction/models
+fi
+
 popd
 
 # ===== LEARNA =====
@@ -119,6 +123,10 @@ if [ ! -d data/rfam_learn_train ]; then
 fi
 rm -rf data/rfam_learn
 
+if [ "$EBENCH_SKIP_PRETRAINED" != "1" ]; then
+    cp -R ../../retrained-models/learna/* models
+fi
+
 popd
 
 # ===== SENTRNA =====
@@ -138,6 +146,10 @@ git checkout 6855a2d0734a962ffa7bf5a5833f52695644e18c
 git apply ../sentrna.patch
 
 conda create -qy -p ../sentrna-env python=2.7 tensorflow=1.15.0 numpy=1.16.6
+
+if [ "$EBENCH_SKIP_PRETRAINED" != "1" ]; then
+    cp -R ../../retrained-models/sentrna/* models
+fi
 
 popd
 

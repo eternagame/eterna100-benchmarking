@@ -18,6 +18,10 @@ Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1
 3. Install python dependencies via pip install -r requirements.txt
 4. Prep external libraries with setup_external.sh
 
+Note that setup_external.sh will by default configure the trained models in `retrained-models` to be available.
+If you want to train the models yourself, you should set the environment variable `EBENCH_SKIP_PRETRAINED=1`
+to ensure the pipeline only uses the newly-trained models from `scripts/queue_train.py`
+
 ## Organization
 
 `data/eterna100_puzzles.tsv`: Metadata for the Eterna100-V1 and Eterna100-V2 benchmarks
