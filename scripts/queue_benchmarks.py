@@ -192,15 +192,15 @@ if __name__ == '__main__':
     parser.add_argument('--timeout', dest='timeout', type=int, default=60*60*24, help='Max amount of time a given solver is allowed to run, in seconds')
     parser.add_argument('--slurm-timeout', dest='slurm_timeout', type=int, default=60*24, help='When running via slurm, the maximum amount of time allocated to a job, in minutes')
 
-    parser.add_argument('--solver', dest='solver', choices=solvers, default=None)
-    parser.add_argument('--folder', dest='folder', choices=['vienna1', 'vienna2'], default=None)
-    parser.add_argument('--structure', dest='structure', type=str, default=None)
-    parser.add_argument('--trial-start', dest='trial_start', type=int, default=1)
-    parser.add_argument('--trial-end', dest='trial_end', type=int, default=5)
+    parser.add_argument('--solver', dest='solver', choices=solvers, default=None, help='default: run all solvers')
+    parser.add_argument('--folder', dest='folder', choices=['vienna1', 'vienna2'], default=None, help='default: run all folders')
+    parser.add_argument('--structure', dest='structure', type=str, default=None, help='Dot-bracket structure to benchmark (default: run all structures in data/eterna100_puzzles.tsv)')
+    parser.add_argument('--trial-start', dest='trial_start', type=int, default=1, help='Trial number to start at')
+    parser.add_argument('--trial-end', dest='trial_end', type=int, default=5, help='Trial number to finish at')
 
-    parser.add_argument('--minimal-solvers', dest='minimal_solvers', action='store_true')
-    parser.add_argument('--extended-solvers', dest='extended_solvers', action='store_true')
-    parser.add_argument('--new-only', dest='new_only', action='store_true')
+    parser.add_argument('--minimal-solvers', dest='minimal_solvers', action='store_true', help='Only run solver configurations in a pre-curated list')
+    parser.add_argument('--extended-solvers', dest='extended_solvers', action='store_true', help='Only run solver configurations which are not in the minimal_solvers list')
+    parser.add_argument('--new-only', dest='new_only', action='store_true', help='Only run benchmark combinations which have not been run before')
 
     args = parser.parse_args()
     run(args)
