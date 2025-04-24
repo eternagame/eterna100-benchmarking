@@ -30,7 +30,7 @@ class Batch:
 
     
     def slurm_array_indexes(self):
-        return f'1-{len(self.jobs)}'
+        return f'1-{len(self.jobs)}' if len(self.jobs) > 1 else None
 
 class JobPacker:
     tasks: list[Task] = []
