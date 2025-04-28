@@ -15,8 +15,9 @@ Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1
   * make, gcc, and g++ (tested with gcc10 and gcc14 - C++17 language feature support is required) for retriving and compiling external dependencies (along with git)
   * Anaconda/miniconda (for isolated environments and python installations necessary for each algorithm)
   * CUDA 10.0 and cuDNN 7.6 (for retraining Eternabrain if GPU acceleration is desired)
-3. Install python dependencies via pip install -r requirements.txt
-4. Prep external libraries with setup_external.sh
+3. Clone the repository, run `cd eterna100-benchmarking`, `git lfs install` and `git lfs pull`
+3. Install python dependencies via `pip install -r requirements.txt`
+4. Prep external libraries with `setup_external.sh`
 
 Note that setup_external.sh will by default configure the trained models in `retrained-models` to be available.
 If you want to train the models yourself, you should set the environment variable `EBENCH_SKIP_PRETRAINED=1`
