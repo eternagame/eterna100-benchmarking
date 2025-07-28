@@ -1,0 +1,222 @@
+diff --git a/DesiRNA-env.yml b/DesiRNA-env.yml
+index f3719f4..7764e45 100644
+--- a/DesiRNA-env.yml
++++ b/DesiRNA-env.yml
+@@ -1,5 +1,6 @@
+ name: DesiRNA-env
+ channels:
++  - conda-forge
+   - defaults
+ dependencies:
+   - _libgcc_mutex=0.1=main
+@@ -9,7 +10,7 @@ dependencies:
+   - brotli=1.0.9=h5eee18b_7
+   - brotli-bin=1.0.9=h5eee18b_7
+   - bzip2=1.0.8=h7b6447c_0
+-  - ca-certificates=2023.08.22=h06a4308_0
++  - ca-certificates=2025.2.25=h06a4308_0
+   - contourpy=1.0.5=py312hdb19cb5_0
+   - cycler=0.11.0=pyhd3eb1b0_0
+   - cyrus-sasl=2.1.28=h52b45da_1
+@@ -40,12 +41,14 @@ dependencies:
+   - libdeflate=1.17=h5eee18b_1
+   - libedit=3.1.20221030=h5eee18b_0
+   - libffi=3.4.4=h6a678d5_0
+-  - libgcc-ng=11.2.0=h1234567_1
+-  - libgomp=11.2.0=h1234567_1
++  - libgcc=13.4.0=h767d61c_3
++  - libgcc-ng=13.4.0=h69a702a_3
++  - libgomp=13.4.0=h767d61c_3
+   - libllvm14=14.0.6=hdb19cb5_3
+   - libpng=1.6.39=h5eee18b_0
+   - libpq=12.15=hdbd6064_1
+-  - libstdcxx-ng=11.2.0=h1234567_1
++  - libstdcxx=13.4.0=h8f9b012_3
++  - libstdcxx-ng=13.4.0=h4852527_3
+   - libtiff=4.5.1=h6a678d5_0
+   - libuuid=1.41.5=h5eee18b_0
+   - libwebp=1.3.2=h11a3e52_0
+@@ -68,7 +71,7 @@ dependencies:
+   - numpy=1.26.2=py312hc5e2394_0
+   - numpy-base=1.26.2=py312h0da6c21_0
+   - openjpeg=2.4.0=h3ad879b_0
+-  - openssl=3.0.12=h7f8727e_0
++  - openssl=3.0.17=h5eee18b_0
+   - packaging=23.1=py312h06a4308_0
+   - pandas=2.1.1=py312h526ad5a_0
+   - pathlib=1.0.1=pyhd3eb1b0_1
+diff --git a/DesiRNA.py b/DesiRNA.py
+index 484d2fe..3837d38 100755
+--- a/DesiRNA.py
++++ b/DesiRNA.py
+@@ -162,6 +162,8 @@ def argument_parser():
+                                 help="Stop after finding desired number of solutions (--results_number). [default = off]")
+     advanced_group.add_argument("-p", "--param", required=False, dest="param", default='1999', choices=['2004', '1999'],
+                                 help="Turner energy parameter for calculating MFE. [default = 1999]")
++    advanced_group.add_argument("--dangles", required=False, dest="dangles", default=2, type=int,
++                                help="Vienna dangles parameter. [default = 2]")
+     advanced_group.add_argument("-tmin", "--tmin", required=False, dest="t_min", default=10, type=float,
+                                 help="Minimal Replica Temperature. [default = 10]")
+     advanced_group.add_argument("-tmax", "--tmax", required=False, dest="t_max", default=150, type=float,
+@@ -238,6 +240,7 @@ def argument_parser():
+     oligo = args.oligo
+     dimer = args.dimer
+     param = args.param
++    dangles = args.dangles
+     exchange_rate = args.exchange
+     scoring_f = sio.parse_scoring_functions(args.scoring_f)
+     pm = args.pm
+@@ -254,7 +257,7 @@ def argument_parser():
+     od = args.od
+     wt = args.wt
+ 
+-    sim_options = DesignOptions(infile, replicas, timlim, acgu_percs, t_max, t_min, oligo, param, exchange_rate, scoring_f, pm, tshelves,\
++    sim_options = DesignOptions(infile, replicas, timlim, acgu_percs, t_max, t_min, oligo, param, dangles, exchange_rate, scoring_f, pm, tshelves,\
+                                 in_seed, subopt, diff_start_replicas, num_results, acgu_content, steps, tm_max, tm_min, motifs, dimer, sws, od, wt)
+ 
+     return sim_options
+@@ -516,6 +519,7 @@ class DesignOptions:
+     T_min (float): Minimum temperature for replicas.
+     oligo (str): Oligomerization option.
+     param (str): Parameter set for RNA folding (e.g., '1999' for Turner 1999 parameters).
++    dangles (int): Vienna dangles option for RNA folding
+     RE_attempt (int): Frequency of replica exchange attempts.
+     scoring_f (str): Scoring function for sequence evaluation.
+     point_mutations (str): Type of point mutations allowed.
+@@ -536,7 +540,7 @@ class DesignOptions:
+     Methods are designed to update various aspects of these attributes.
+     """
+ 
+-    def __init__(self, infile, replicas, timlim, acgu_percentages, T_max, T_min, oligo, param, RE_attempt, scoring_f, point_mutations,
++    def __init__(self, infile, replicas, timlim, acgu_percentages, T_max, T_min, oligo, param, dangles, RE_attempt, scoring_f, point_mutations,
+                  tshelves, in_seed, subopt, diff_start_replicas, num_results, acgu_content, RE_steps, tm_max, tm_min, motifs, dimer, sws, od, wt):
+         """
+         Initializes the DesignOptions object with provided simulation parameters.
+@@ -550,6 +554,7 @@ class DesignOptions:
+         self.T_min = T_min
+         self.oligo = oligo
+         self.param = param
++        self.dangles = dangles
+         self.RE_attempt = RE_attempt
+         self.scoring_f = scoring_f
+         self.point_mutations = point_mutations
+diff --git a/utils/energy_scores.py b/utils/energy_scores.py
+index 874ddff..7e5efdc 100644
+--- a/utils/energy_scores.py
++++ b/utils/energy_scores.py
+@@ -24,10 +24,6 @@ from utils import sequence_utils as seq_utils
+ 
+ from utils.sim_score import SimScore
+ 
+-md = RNA.md()
+-md.compute_bpp = 0
+-
+-
+ def score_sequence(seq, input_file, sim_options):
+     """
+     Calculate various scoring metrics for a given RNA sequence.
+@@ -62,11 +58,11 @@ def score_sequence(seq, input_file, sim_options):
+     """
+ 
+     if sim_options.oligo_state != "homodimer":
+-        scored_sequence = ScoreSeq(sequence=seq)
++        scored_sequence = ScoreSeq(sequence=seq, dangles=sim_options.dangles)
+     else:
+         # seq = seq.split("&")[0]
+         # seq = seq + "&" + seq
+-        scored_sequence = ScoreSeq(sequence=seq)
++        scored_sequence = ScoreSeq(sequence=seq, dangles=sim_options.dangles)
+     pf_energy, mfe_structure, fold_comp = get_mfe_e_ss(seq, sim_options)
+ 
+     scored_sequence.get_Epf(pf_energy)
+@@ -144,7 +140,7 @@ def get_mfe_e_ss(seq, sim_options):
+     The 'pks' option in 'sim_options' determines whether pseudoknots are considered in the structure.
+     """
+ 
+-    fc = RNA.fold_compound(seq, md)
++    fc = RNA.fold_compound(seq, RNA.md(compute_bpp=0, dangles=sim_options.dangles))
+ 
+     if sim_options.oligo_state in {"none", "avoid"}:
+         structure, energy = fc.pf()
+@@ -165,7 +161,7 @@ class ScoreSeq:
+     the sequence, such as energy scores, structural properties, and statistical measures.
+     """
+ 
+-    def __init__(self, sequence):
++    def __init__(self, sequence, dangles):
+         """
+         Initialize a ScoreSeq instance with a specific RNA sequence and default values for various
+         scoring parameters.
+@@ -193,6 +189,7 @@ class ScoreSeq:
+         self.precision = 0
+         self.edesired2 = 0
+         self.edesired2_minus_Epf = 0
++        self.dangles = dangles
+ 
+     def get_replica_num(self, rep_num):
+         """
+@@ -351,7 +348,9 @@ class ScoreSeq:
+         """
+         Calculate and set the minimum free energy (MFE) for the RNA folding of this sequence.
+         """
+-        self.MFE = RNA.fold(self.sequence)[1]
++        md = RNA.md(dangles=self.dangles)
++        fc = RNA.fold_compound(self.sequence, md)
++        self.MFE = fc.mfe()[1]
+ 
+     def get_edesired_minus_MFE(self):
+         """
+@@ -366,7 +365,7 @@ class ScoreSeq:
+         Parameters:
+         sec_struct (str): The secondary structure for which to calculate the ensemble defect.
+         """
+-        md = RNA.md()
++        md = RNA.md(dangles=self.dangles)
+         fc = RNA.fold_compound(self.sequence, md)
+         (_, mfe) = fc.mfe()
+         fc.exp_params_rescale(mfe)
+@@ -413,7 +412,8 @@ class ScoreSeq:
+         """
+         Update the scoring function for this sequence by including the effect of monomer fraction.
+         """
+-        fc = RNA.fold_compound(self.sequence + "&" + self.sequence)
++        md = RNA.md(dangles=self.dangles)
++        fc = RNA.fold_compound(self.sequence + "&" + self.sequence, md)
+         self.oligo_fraction = dme.oligo_fraction(self.sequence + "&" + self.sequence, fc)
+         self.monomer_bonus = dme.kTlog_monomer_fraction(self.oligo_fraction)
+         self.scoring_function = self.scoring_function + self.monomer_bonus
+diff --git a/utils/sequence_utils.py b/utils/sequence_utils.py
+index 8c744ad..3095646 100644
+--- a/utils/sequence_utils.py
++++ b/utils/sequence_utils.py
+@@ -763,7 +763,7 @@ def initial_sequence_generator(nt_list, input_file, sim_options):
+     return result_sequence
+ 
+ 
+-def get_alt_mcc(simulation_data, input_file):
++def get_alt_mcc(simulation_data, input_file, dangles):
+     """
+     Calculates the MCC for alternative structures against suboptimal structures generated from sequences.
+ 
+@@ -777,7 +777,7 @@ def get_alt_mcc(simulation_data, input_file):
+ 
+     for i in (range(len(simulation_data))):
+         sequence = simulation_data[i]["sequence"]
+-        fc = RNA.fold_compound(sequence)
++        fc = RNA.fold_compound(sequence, md=RNA.md(dangles=dangles))
+         for k in range(len(input_file.alt_sec_structs)):
+ 
+             subopt_struct = es.get_first_suboptimal_structure_and_energy(sequence, fc, k + 1)[0]
+diff --git a/utils/stats_inputs_outputs.py b/utils/stats_inputs_outputs.py
+index a6e08c7..ca0b451 100644
+--- a/utils/stats_inputs_outputs.py
++++ b/utils/stats_inputs_outputs.py
+@@ -442,7 +442,7 @@ def sort_and_filter_simulation_data_alternative(simulation_data, sim_options, in
+     data_no_duplicates = list(remove_duplicates.values())
+     sorted_results = sorted(seq_utils.round_floats(data_no_duplicates), key=lambda d: (-d['mcc'],  -d['edesired_minus_Epf'], -d['Epf'], -d['scoring_function']), reverse=True)
+ 
+-    dat_alt_mcc = seq_utils.get_alt_mcc(sorted_results, input_file)
++    dat_alt_mcc = seq_utils.get_alt_mcc(sorted_results, input_file, sim_options.dangles)
+ 
+     mcc_list = []
+     for i in range(len(input_file.alt_sec_structs)):

@@ -153,4 +153,21 @@ fi
 
 popd
 
+# ===== DESIRNA =====
+if [ ! -d DesiRNA ]; then
+    git clone https://github.com/fryzjergda/DesiRNA
+    pushd DesiRNA
+else
+    pushd DesiRNA
+    git fetch
+fi
+# In order to make sure our patch applies cleanly, throw out any prior modifications
+# We use git stash instead of git clean just in case there were intentional local modifications
+# someone wants to retrieve (the overhead incurred here should not be substantial)
+git stash -u
+git checkout bdb490839941daf30fe9119cbc4e2961d57f3a36
+git apply ../desirna.patch
+
+conda env create -qy -p ../desirna-env --file DesiRNA-env.yml
+
 popd
