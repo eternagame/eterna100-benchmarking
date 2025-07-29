@@ -1,0 +1,45 @@
+import os
+import re
+from typing import Literal
+from subprocess import PIPE, Popen, STDOUT, TimeoutExpired
+import tempfile
+
+external_path = os.path.join(os.path.dirname(__file__), '../../external')
+
+
+def solve(structure: str, vienna_version: Literal['1', '2'], timeout: int):
+    try:
+        params = [os.path.join(external_path, 'DesiRNA.py')]
+        if vienna_version == '1':
+            params.append('--dangles=1')
+        else:
+            params.append('--param=2004')
+        params.append('-f')
+
+        tf_content = f'>name\nf1\n>seq_restr\n{"N" * len(structure)}\n>seq\n{structure}\n'
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as fp:
+            fp.write(tf_content)
+            fp.close()
+
+        params.append(fp.name)
+        p = Popen(params, stdout=PIPE, stdin=PIPE,
+                  stderr=STDOUT, encoding='utf8', cwd=external_path)
+
+        res = p.communicate(timeout=timeout)[0]
+        breakpoint()
+        clean_res = res.replace('\n', '\\n')
+        print(
+            f'desirna(v={vienna_version}, s={structure}): {clean_res}')
+
+        match = re.search(r'NMC: ([AUGC]+).*\nSTR: ([\(\).]+)', res)
+        return {
+            'Sequence': match.group(1),
+            'Returned Structure': match.group(2),
+        }
+    except TimeoutExpired:
+        print(
+            f'desirna(v={vienna_version}, s={structure}): <timeout>')
+        return {
+            'Sequence': '<timeout>',
+            'Returned Structure': '<timeout>',
+        }

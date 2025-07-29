@@ -11,12 +11,15 @@ from util.slurm import sbatch
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '../data')
 
+
 def run(args):
     puzzles = pd.read_csv(f'{DATA_DIR}/eterna100_puzzles.tsv', sep='\t')
-    structures = pd.concat([puzzles['Secondary Structure V1'], puzzles['Secondary Structure V2']]).unique()
-    v2_unsolveable_structures = puzzles[puzzles['Secondary Structure V1'] != puzzles['Secondary Structure V2']]['Secondary Structure V1'].to_list()
-    v1_unsolveable_structures = puzzles[puzzles['Puzzle Name'] == 'Hoglafractal']['Secondary Structure V2'].to_list()
-
+    structures = pd.concat(
+        [puzzles['Secondary Structure V1'], puzzles['Secondary Structure V2']]).unique()
+    v2_unsolveable_structures = puzzles[puzzles['Secondary Structure V1'] !=
+                                        puzzles['Secondary Structure V2']]['Secondary Structure V1'].to_list()
+    v1_unsolveable_structures = puzzles[puzzles['Puzzle Name']
+                                        == 'Hoglafractal']['Secondary Structure V2'].to_list()
 
     all_results_queuetime = pd.DataFrame(columns=[
         'Algorithm',
@@ -28,8 +31,8 @@ def run(args):
     if args.new_only:
         with FileLock(f'{DATA_DIR}/results.tsv.lock'):
             if os.path.exists(f'{DATA_DIR}/results.tsv'):
-                all_results_queuetime = pd.read_csv(f'{DATA_DIR}/results.tsv', sep='\t')
-            
+                all_results_queuetime = pd.read_csv(
+                    f'{DATA_DIR}/results.tsv', sep='\t')
 
     packer = JobPacker()
     for (solver, folder, structure, trial) in product(
@@ -45,6 +48,7 @@ def run(args):
             continue
         minimal_solvers = [
             'rnainverse',
+            'desirna',
             'nemo-2500',
             'learna-pretrained',
             'learna-retrained-vienna1',
@@ -136,7 +140,8 @@ def run(args):
             res['Extra'] = json.dumps(res['Extra'])
             with FileLock(f'{DATA_DIR}/results.tsv.lock'):
                 if os.path.exists(f'{DATA_DIR}/results.tsv'):
-                    all_results = pd.read_csv(f'{DATA_DIR}/results.tsv', sep='\t')
+                    all_results = pd.read_csv(
+                        f'{DATA_DIR}/results.tsv', sep='\t')
                     all_results = all_results[~(
                         (all_results['Algorithm'] == res['Algorithm'])
                         & (all_results['Variant'] == res['Variant'])
@@ -154,14 +159,17 @@ def run(args):
                         'Trial'
                     ])
                 all_results = pd.concat([all_results, pd.DataFrame([res])])
-                all_results = all_results.sort_values(by=['Algorithm', 'Variant', 'Folder', 'Target Structure', 'Trial'])
-                all_results.to_csv(f'{DATA_DIR}/results.tsv', sep='\t', index=False)
-    
+                all_results = all_results.sort_values(
+                    by=['Algorithm', 'Variant', 'Folder', 'Target Structure', 'Trial'])
+                all_results.to_csv(
+                    f'{DATA_DIR}/results.tsv', sep='\t', index=False)
+
     if args.scheduler == 'slurm':
         batches = packer.pack(args.slurm_timeout * 60)
         jobs = [job for batch in batches for job in batch.jobs]
         tasks = [task for job in jobs for task in job.commands]
-        print(f'Queueing {len(batches)} batches/{len(jobs)} jobs/{len(tasks)} benchmarks')
+        print(
+            f'Queueing {len(batches)} batches/{len(jobs)} jobs/{len(tasks)} benchmarks')
 
         job_name = 'e100-bench'
         if args.solver is not None:
@@ -174,7 +182,8 @@ def run(args):
             sbatch(
                 batch.to_sh(),
                 f'{job_name}_m-{batch.memory}',
-                timeout=ceil((max([job.time_allocation for job in batch.jobs]) + 60 * 30) / 60),
+                timeout=ceil(
+                    (max([job.time_allocation for job in batch.jobs]) + 60 * 30) / 60),
                 partition=args.slurm_partition,
                 cpus=1,
                 memory_per_cpu=batch.memory,
@@ -184,23 +193,36 @@ def run(args):
                 constraint='CPU_MNF:AMD&CPU_SKU:7502'
             )
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--scheduler', dest='scheduler', choices=['naive', 'slurm'], default='naive')
-    parser.add_argument('--slurm-partition', dest='slurm_partition', type=str, default=None)
-    parser.add_argument('--timeout', dest='timeout', type=int, default=60*60*24, help='Max amount of time a given solver is allowed to run, in seconds')
-    parser.add_argument('--slurm-timeout', dest='slurm_timeout', type=int, default=60*24, help='When running via slurm, the maximum amount of time allocated to a job, in minutes')
+    parser.add_argument('--scheduler', dest='scheduler',
+                        choices=['naive', 'slurm'], default='naive')
+    parser.add_argument('--slurm-partition',
+                        dest='slurm_partition', type=str, default=None)
+    parser.add_argument('--timeout', dest='timeout', type=int, default=60*60*24,
+                        help='Max amount of time a given solver is allowed to run, in seconds')
+    parser.add_argument('--slurm-timeout', dest='slurm_timeout', type=int, default=60*24,
+                        help='When running via slurm, the maximum amount of time allocated to a job, in minutes')
 
-    parser.add_argument('--solver', dest='solver', choices=solvers, default=None, help='default: run all solvers')
-    parser.add_argument('--folder', dest='folder', choices=['vienna1', 'vienna2'], default=None, help='default: run all folders')
-    parser.add_argument('--structure', dest='structure', type=str, default=None, help='Dot-bracket structure to benchmark (default: run all structures in data/eterna100_puzzles.tsv)')
-    parser.add_argument('--trial-start', dest='trial_start', type=int, default=1, help='Trial number to start at')
-    parser.add_argument('--trial-end', dest='trial_end', type=int, default=5, help='Trial number to finish at')
+    parser.add_argument('--solver', dest='solver', choices=solvers,
+                        default=None, help='default: run all solvers')
+    parser.add_argument('--folder', dest='folder', choices=[
+                        'vienna1', 'vienna2'], default=None, help='default: run all folders')
+    parser.add_argument('--structure', dest='structure', type=str, default=None,
+                        help='Dot-bracket structure to benchmark (default: run all structures in data/eterna100_puzzles.tsv)')
+    parser.add_argument('--trial-start', dest='trial_start',
+                        type=int, default=1, help='Trial number to start at')
+    parser.add_argument('--trial-end', dest='trial_end',
+                        type=int, default=5, help='Trial number to finish at')
 
-    parser.add_argument('--minimal-solvers', dest='minimal_solvers', action='store_true', help='Only run solver configurations in a pre-curated list')
-    parser.add_argument('--extended-solvers', dest='extended_solvers', action='store_true', help='Only run solver configurations which are not in the minimal_solvers list')
-    parser.add_argument('--new-only', dest='new_only', action='store_true', help='Only run benchmark combinations which have not been run before')
+    parser.add_argument('--minimal-solvers', dest='minimal_solvers', action='store_true',
+                        help='Only run solver configurations in a pre-curated list')
+    parser.add_argument('--extended-solvers', dest='extended_solvers', action='store_true',
+                        help='Only run solver configurations which are not in the minimal_solvers list')
+    parser.add_argument('--new-only', dest='new_only', action='store_true',
+                        help='Only run benchmark combinations which have not been run before')
 
     args = parser.parse_args()
     run(args)
