@@ -26,7 +26,7 @@ def solve(structure: str, vienna_version: Literal['1', '2'], timeout: int):
                 f.write(f'>name\nf1\n>seq_restr\n{"N" * len(structure)}\n>sec_struct\n{structure}\n')
             params.append(f'{tempdir}/in.txt')
 
-            p = Popen(params, stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8', cwd=external_path)
+            p = Popen(params, stdout=PIPE, stdin=PIPE, stderr=STDOUT, encoding='utf8', cwd=tempdir)
             res = p.communicate(timeout=timeout)[0].strip()
         
         clean_res = res.replace('\n', '\\n')
