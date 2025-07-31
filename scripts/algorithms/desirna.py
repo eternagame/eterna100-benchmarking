@@ -12,7 +12,7 @@ def solve(structure: str, vienna_version: Literal['1', '2'], timeout: int):
         params = [
             os.path.join(external_path, 'desirna-env/bin/python'),
             os.path.join(external_path, 'DesiRNA/DesiRNA.py'),
-            '--results_number=1', '--stop_when_solved=on', '--without_timer=on', f'--timelimit={timeout}', '--replicas=1'
+            '--results_number=1', '--stop_when_solved=on', '--without_timer=on', f'--timelimit={timeout}',
         ]
         if vienna_version == '1':
             params.append('--dangles=1')

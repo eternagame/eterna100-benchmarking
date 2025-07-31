@@ -185,6 +185,19 @@ index 874ddff..7e5efdc 100644
          self.oligo_fraction = dme.oligo_fraction(self.sequence + "&" + self.sequence, fc)
          self.monomer_bonus = dme.kTlog_monomer_fraction(self.oligo_fraction)
          self.scoring_function = self.scoring_function + self.monomer_bonus
+diff --git a/utils/replica_exchange_monte_carlo.py b/utils/replica_exchange_monte_carlo.py
+index 0a8b148..292e574 100644
+--- a/utils/replica_exchange_monte_carlo.py
++++ b/utils/replica_exchange_monte_carlo.py
+@@ -245,7 +245,7 @@ def mutate_sequence_re(lst_seq_obj, nt_list, stats_obj, sim_options, input_file)
+         tuple: A tuple containing the list of mutated sequence objects and the updated statistics object.
+     """
+ 
+-    with mp.Pool(sim_options.replicas) as pool:
++    with mp.Pool(1) as pool:
+         # Generate a unique seed for each worker based on original_seed
+         seeds = [i for i in range(len(lst_seq_obj))]
+ 
 diff --git a/utils/sequence_utils.py b/utils/sequence_utils.py
 index 8c744ad..3095646 100644
 --- a/utils/sequence_utils.py
