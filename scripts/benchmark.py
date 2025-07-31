@@ -28,7 +28,7 @@ def run(solver, folder, structure, timeout):
             structure, '1.8.5' if folder == 'vienna1' else '2.6.4', timeout)
     elif solver == 'desirna':
         def solve(): return desirna.solve(
-            structure, '1.8.5' if folder == 'vienna1' else '2.6.4', timeout)
+            structure, '1' if folder == 'vienna1' else '2', timeout)
     elif solver == 'nemo-2500':
         def solve(): return nemo.solve(structure, '1' if folder ==
                                        'vienna1' else '2', 2500, timeout)
