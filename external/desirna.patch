@@ -46,7 +46,7 @@ index f3719f4..7764e45 100644
    - pandas=2.1.1=py312h526ad5a_0
    - pathlib=1.0.1=pyhd3eb1b0_1
 diff --git a/DesiRNA.py b/DesiRNA.py
-index 484d2fe..3837d38 100755
+index 484d2fe..de62c92 100755
 --- a/DesiRNA.py
 +++ b/DesiRNA.py
 @@ -162,6 +162,8 @@ def argument_parser():
@@ -75,7 +75,15 @@ index 484d2fe..3837d38 100755
                                  in_seed, subopt, diff_start_replicas, num_results, acgu_content, steps, tm_max, tm_min, motifs, dimer, sws, od, wt)
  
      return sim_options
-@@ -516,6 +519,7 @@ class DesignOptions:
+@@ -454,6 +457,7 @@ def update_options(sim_options, input_file_obj):
+ 
+     if sim_options.param == '1999':
+         RNA.params_load(os.path.join(script_path, "rna_turner1999.par"))
++    RNA.cvar.dangles = sim_options.dangles
+ 
+     if sim_options.acgu_content == '':
+         sim_options.add_nt_perc({"A": 15, "C": 30, "G": 30, "U": 15})
+@@ -516,6 +520,7 @@ class DesignOptions:
      T_min (float): Minimum temperature for replicas.
      oligo (str): Oligomerization option.
      param (str): Parameter set for RNA folding (e.g., '1999' for Turner 1999 parameters).
@@ -83,7 +91,7 @@ index 484d2fe..3837d38 100755
      RE_attempt (int): Frequency of replica exchange attempts.
      scoring_f (str): Scoring function for sequence evaluation.
      point_mutations (str): Type of point mutations allowed.
-@@ -536,7 +540,7 @@ class DesignOptions:
+@@ -536,7 +541,7 @@ class DesignOptions:
      Methods are designed to update various aspects of these attributes.
      """
  
@@ -92,7 +100,7 @@ index 484d2fe..3837d38 100755
                   tshelves, in_seed, subopt, diff_start_replicas, num_results, acgu_content, RE_steps, tm_max, tm_min, motifs, dimer, sws, od, wt):
          """
          Initializes the DesignOptions object with provided simulation parameters.
-@@ -550,6 +554,7 @@ class DesignOptions:
+@@ -550,6 +555,7 @@ class DesignOptions:
          self.T_min = T_min
          self.oligo = oligo
          self.param = param
