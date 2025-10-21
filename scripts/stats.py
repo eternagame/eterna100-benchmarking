@@ -59,11 +59,11 @@ def summerize(x):
     return group.iloc[0]
 
 def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
-    solves = res[
+    solves_reported_variants = res[
         (res['Variant'].str.contains('pretrained') | ~(res['Variant'].str.contains('retrained'))) & ~(res['Variant'].str.contains('flipsap'))
     ]
-    solves = solves[
-        solves['Target Structure'].isin(puz[f'Secondary Structure V{bench_version}'])
+    solves = solves_reported_variants[
+        solves_reported_variants['Target Structure'].isin(puz[f'Secondary Structure V{bench_version}'])
     ]
     solves = solves.merge(
         puz[['Puzzle #', f'Secondary Structure V{bench_version}', 'Puzzle Name']],
@@ -81,7 +81,10 @@ def plot(vienna_version, bench_version, ax, xticks=False, yticks=False):
     solves = solves[
         solves['Folder'] == f'vienna{vienna_version}'
     ].set_index(['Algorithm', 'Variant', 'Folder']).groupby(['Algorithm', 'Variant']).apply(summerize)
-    algosolves = solves.groupby('Algorithm').apply(lambda x: x['Total'].mean())
+    
+    algosolves = solves_reported_variants.set_index(
+        ['Algorithm', 'Variant', 'Folder']
+    )['Success'].groupby('Algorithm').sum()
     solves['AlgoSolves'] = solves.apply(lambda x: algosolves[x.name[0]], axis=1)
     solves = solves.sort_values(['AlgoSolves', 'Variant'], axis=0)
     del solves['Total']
