@@ -49,3 +49,47 @@ to ensure the pipeline only uses the newly-trained models from `scripts/queue_tr
 * To benchmark an algorithm in a particular configuration, run `scripts/benchmark.py` (Run `benchmark.py -h` for full usage information)
 * To run benchmarks in bulk, run `scripts/queue_benchmarks.py` (By default runs all benchmarks and runs sequentially - run `queue_benchmarks.py -h` for full usage information)
 * To generate summary statistics, run `scripts/stats.py`
+
+## How to run the Vienna1 and Vienna2 engines
+Each benchmark is defined by a **stock build of a specific ViennaRNA version**, run with no flags
+other than the temperature. This is all `scripts/util/fold.py` does:
+
+```
+RNAfold -T 37.0
+```
+
+| Benchmark | Engine | Energy parameters | `dangles` default |
+|---|---|---|--:|
+| **Eterna100-V1** ("Vienna 1") | ViennaRNA **1.8.5** | Turner 1999 | **1** |
+| **Eterna100-V2** ("Vienna 2") | ViennaRNA **2.1.9** or **2.6.4** | Turner 2004 | **2** |
+
+The `dangles` defaults are compiled in, not passed on the command line: `lib/fold_vars.c` in 1.8.5
+and 2.1.9, `src/ViennaRNA/model.h` in 2.6.4. Eterna's in-game engine is the Vienna 1 model (EternaJS sets `EPars.DANGLES = 1`) and early design methods like NEMO used this model (e.g., `nemo.cpp` loads `vrna185x.par` with `dangles = 1`).
+
+2.1.9 and 2.6.4 return identical MFE structures for Eterna100 designs, so either may be used for
+Vienna 2.
+
+
+### Common pitfall: Turner 1999 parameters alone are not Vienna 1
+
+Loading the Turner 1999 parameters into a ViennaRNA 2.x binary or its Python bindings does **not**
+reproduce Vienna 1, because 2.x leaves `dangles` at 2 while 1.8.5 uses 1. The result is a hybrid of
+the two models that is neither benchmark, and on Eterna100 targets it is more permissive than
+either: it accepts designs that neither stock engine folds to the target.
+
+```python
+import RNA
+
+# WRONG for Vienna 1 -- dangles is still 2
+RNA.params_load_RNA_Turner1999()
+structure, mfe = RNA.fold_compound(seq).mfe()
+
+# The Vienna 1 model, inside ViennaRNA 2.x
+RNA.params_load_RNA_Turner1999()
+md = RNA.md(dangles=1)
+structure, mfe = RNA.fold_compound(seq, md).mfe()
+```
+
+From command line, `RNAfold -P rna_turner1999.par -d1` on 2.1.9 or 2.6.4 reproduces the 1.8.5 energy model
+exactly, but **not** the traceback to derive the MFE structure. Where the MFE structure is **degenerate**, Vienna 2.x can pick a different co-optimal structure than 1.8.5 does. So, score against the stock 1.8.5 binary for Vienna 1 benchmark – for degenerate MFEs no parameter-file substitution with 2.x binaries reproduces it.
+
