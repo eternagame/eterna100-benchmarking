@@ -105,7 +105,9 @@ The published benchmark scores a design on its **target structure alone**. In th
 these puzzles also carry *player constraints* that a solution must satisfy: limits on how many
 pairs of each type may be used, and bases the player is forbidden to change.
 `data/eterna100_player_constraints.csv` records them, pulled from the public Eterna API, with one
-row per puzzle per engine (400 rows).  More information on these constraints are provided in the [eterna-validator repo](https://github.com/eternagame/eterna-validator).  These constraints are *not* settings for the current Eterna100-V1 or Eterna100-V2 benchmarks but do make targets harder while still remaining solvable by the best Eterna players. These constraints can be added to provide stress tests
+row per puzzle per engine (400 rows).  
+
+More information on these constraints is provided in the [eterna-validator repo](https://github.com/eternagame/eterna-validator).  These constraints are *not* settings for the current Eterna100-V1 or Eterna100-V2 benchmarks but do make targets harder while still remaining solvable by the best Eterna players. These constraints can be added to provide stress tests
 
 How many puzzles are affected:
 
