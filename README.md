@@ -10,14 +10,15 @@ Scripts and results for benchmarking RNA design algorithms with the Eterna100-V1
   * Unix environment (tested on Linux, other operating systems may require alternate processes for setting up external dependencies)
   * An available CUDA device, Turing generation or earlier (for retraining Eternabrain if GPU acceleration is desired)
 2. Ensure the following prerequisites are installed:
-  * git and git-lfs
+  * git and  git-lfs (only to try retrained Eternabrain)
   * Python 3.11+
   * make, gcc, and g++ (tested with gcc10 and gcc14 - C++17 language feature support is required) for retriving and compiling external dependencies (along with git)
   * Anaconda/miniconda (for isolated environments and python installations necessary for each algorithm)
   * CUDA 10.0 and cuDNN 7.6 (for retraining Eternabrain if GPU acceleration is desired)
-3. Clone the repository, run `cd eterna100-benchmarking`, `git lfs install` and `git lfs pull`
-3. Install python dependencies via `pip install -r requirements.txt`
-4. Prep external libraries with `setup_external.sh`
+3. Clone the repository,
+4. If you want to try the retrained Eternabrain neural network parameters, `cd eterna100-benchmarking`, `git lfs install` and `git lfs pull`
+5. Install python dependencies via `pip install -r requirements.txt`
+6. Prep external libraries with `setup_external.sh`
 
 Note that setup_external.sh will by default configure the trained models in `retrained-models` to be available.
 If you want to train the models yourself, you should set the environment variable `EBENCH_SKIP_PRETRAINED=1`
@@ -26,6 +27,8 @@ to ensure the pipeline only uses the newly-trained models from `scripts/queue_tr
 ## Organization
 
 `data/eterna100_puzzles.tsv`: Metadata for the Eterna100-V1 and Eterna100-V2 benchmarks
+
+`data/eterna100_player_constraints.csv`: In-game player constraints (*special advanced setting*; see below)
 
 `data/results.tsv`: Benchmarking results
 
@@ -92,4 +95,35 @@ structure, mfe = RNA.fold_compound(seq, md).mfe()
 
 From command line, `RNAfold -P rna_turner1999.par -d1` on 2.1.9 or 2.6.4 reproduces the 1.8.5 energy model
 exactly, but **not** the traceback to derive the MFE structure. Where the MFE structure is **degenerate**, Vienna 2.x can pick a different co-optimal structure than 1.8.5 does. So, score against the stock 1.8.5 binary for Vienna 1 benchmark – for degenerate MFEs no parameter-file substitution with 2.x binaries reproduces it.
+
+More information and examples for off-line scoring are provided in the [eterna-validator repo](https://github.com/eternagame/eterna-validator).
+
+
+## Player constraints (the advanced condition)
+
+The published benchmark scores a design on its **target structure alone**. In the game, most of
+these puzzles also carry *player constraints* that a solution must satisfy: limits on how many
+pairs of each type may be used, and bases the player is forbidden to change.
+`data/eterna100_player_constraints.csv` records them, pulled from the public Eterna API, with one
+row per puzzle per engine (400 rows).  More information on these constraints are provided in the [eterna-validator repo](https://github.com/eternagame/eterna-validator).  These constraints are *not* settings for the current Eterna100-V1 or Eterna100-V2 benchmarks but do make targets harder while still remaining solvable by the best Eterna players. These constraints can be added to provide stress tests
+
+How many puzzles are affected:
+
+| Benchmark | Engine | Pair-type limits | Locked bases | Notes
+|---|---|--:|--:|--:|
+| **Eterna100-V1** | Vienna1 | 72 | 22 | original, fully solvable |
+| **Eterna100-V1** | Vienna2 | 39 | 17 | not fully solvable |
+| **Eterna100-V2** | Vienna1 | 62 | 20 | not fully solvable |
+| **Eterna100-V2** | Vienna2 | 40 | 17 | **modernized**, fully solvable |
+
+Two things to watch:
+
+* `CONSECUTIVE_G` / `CONSECUTIVE_C` limits (a cap on the longest run of one base) appear only in the
+  raw `constraints` string, not in a dedicated column. They exist on the Vienna1 puzzles and on
+  none of the Vienna2 ones, which dropped that constraint class.
+* The sample solutions in `eterna100_puzzles.tsv` were produced against the target structure only.
+  The `Eterna100-V1/Vienna1` solutions happen to satisfy every constraint, but **50 of the 99 disclosed
+  `Eterna100-V2/Vienna2` solutions do not** (35 break a pair limit, 14 break a lock, 1 breaks both). They
+  remain valid for the published target-only benchmark; they are not legal in-game solutions, though such solutions do exist.
+
 
