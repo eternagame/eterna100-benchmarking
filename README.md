@@ -130,8 +130,7 @@ Two things to watch:
   Jieux, lroppy (Leonard Oppenheimer), jnicol (John Nicol) and JSci — drawn at random per puzzle
   from those players' validated submissions. All 377 disclosed solutions pass
   [eterna-validator](https://github.com/eternagame/eterna-validator) `check_design.py` with player
-  constraints enforced (ViennaRNA 1.8.5 for Vienna1, 2.7.2 for Vienna2).
-  `data/sample_solution_provenance.tsv` records which player supplied each solution. Undisclosed and unsolved
+  constraints enforced (ViennaRNA 1.8.5 for Vienna1, 2.7.2 for Vienna2). Undisclosed and unsolved
   entries are unchanged: `Teslagon` (puzzle 100) in every column, puzzle 97 under
   `Eterna100-V2/Vienna1`, and the 18 targets unsolvable in Vienna 2 under `Eterna100-V1/Vienna2`.
 
