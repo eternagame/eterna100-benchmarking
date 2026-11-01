@@ -123,9 +123,16 @@ Two things to watch:
 * `CONSECUTIVE_G` / `CONSECUTIVE_C` limits (a cap on the longest run of one base) appear only in the
   raw `constraints` string, not in a dedicated column. They exist on the Vienna1 puzzles and on
   none of the Vienna2 ones, which dropped that constraint class.
-* The sample solutions in `eterna100_puzzles.tsv` were produced against the target structure only.
-  The `Eterna100-V1/Vienna1` solutions happen to satisfy every constraint, but **50 of the 99 disclosed
-  `Eterna100-V2/Vienna2` solutions do not** (35 break a pair limit, 14 break a lock, 1 breaks both). They
-  remain valid for the published target-only benchmark; they are not legal in-game solutions, though such solutions do exist.
+* The sample solutions in `eterna100_puzzles.tsv` are **legal in-game solutions**: every disclosed
+  solution satisfies its puzzle's player constraints as well as its target structure. The
+  `Eterna100-V1/Vienna1` column already did; the `Eterna100-V1/Vienna2`, `Eterna100-V2/Vienna1` and
+  `Eterna100-V2/Vienna2` columns hold solutions submitted in-game by Eterna players — wawan151,
+  Jieux, lroppy (Leonard Oppenheimer), jnicol (John Nicol) and JSci — drawn at random per puzzle
+  from those players' validated submissions. All 377 disclosed solutions pass
+  [eterna-validator](https://github.com/eternagame/eterna-validator) `check_design.py` with player
+  constraints enforced (ViennaRNA 1.8.5 for Vienna1, 2.7.2 for Vienna2).
+  `data/sample_solution_provenance.tsv` records which player supplied each solution. Undisclosed and unsolved
+  entries are unchanged: `Teslagon` (puzzle 100) in every column, puzzle 97 under
+  `Eterna100-V2/Vienna1`, and the 18 targets unsolvable in Vienna 2 under `Eterna100-V1/Vienna2`.
 
 
