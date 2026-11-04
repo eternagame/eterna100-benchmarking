@@ -1,4 +1,4 @@
 pandas==3.0.3
 pyarrow==24.0.0
-filelock==3.29.0
+filelock==4.2.4
 matplotlib==3.10.9
